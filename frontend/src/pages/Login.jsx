@@ -1,7 +1,11 @@
 import { useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const ENV_LOGIN_EMAIL = import.meta.env.VITE_LOGIN_EMAIL || "";
+const ENV_LOGIN_PASSWORD = import.meta.env.VITE_LOGIN_PASSWORD || "";
+
 export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: ENV_LOGIN_EMAIL, password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,19 +18,31 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      if (ENV_LOGIN_EMAIL && ENV_LOGIN_PASSWORD) {
+        const isValidEnvLogin =
+          form.email === ENV_LOGIN_EMAIL && form.password === ENV_LOGIN_PASSWORD;
 
-      const data = await res.json();
-
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        window.location.href = "/dashboard";
+        if (isValidEnvLogin) {
+          localStorage.setItem("token", "env-login-token");
+          window.location.href = "/overview";
+        } else {
+          setError("Invalid email or password.");
+        }
       } else {
-        setError(data.message || "Invalid email or password.");
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "/overview";
+        } else {
+          setError(data.message || "Invalid email or password.");
+        }
       }
     } catch {
       setError("Cannot reach server. Is the backend running?");

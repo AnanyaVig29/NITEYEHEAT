@@ -9,6 +9,7 @@ import "./styles/analytics.css";
 import "./styles/abtesting.css";
 import "./styles/EyeMovementPatterns.css";
 
+
 // Import pages
 import Overview from "./pages/overview";
 import Analytics from "./pages/analytics";
@@ -16,6 +17,7 @@ import Reports from "./pages/reports";
 import Alerts from "./pages/alerts";
 import ABTesting from "./pages/abtesting";
 import EyeMovementPatterns from "./pages/EyeMovementPatterns";
+import Login from "./pages/Login";
 
 function App() {
   const [isNavOpen, setIsNavOpen] = useState(true);
@@ -42,6 +44,7 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Navigate to="/overview" replace />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/overview" element={<Overview />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/alerts" element={<Alerts />} />
