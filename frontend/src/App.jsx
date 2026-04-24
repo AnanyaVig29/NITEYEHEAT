@@ -10,6 +10,7 @@ import "./styles/reports.css";
 import "./styles/abtesting.css";
 import "./styles/EyeMovementPatterns.css";
 import "./styles/Login.css";
+import "./styles/settings.css";
 
 
 // Import pages
@@ -20,6 +21,7 @@ import Alerts from "./pages/alerts";
 import ABTesting from "./pages/abtesting";
 import EyeMovementPatterns from "./pages/EyeMovementPatterns";
 import Login from "./pages/Login";
+import Settings from "./pages/settings";
 
 function App() {
   const [isNavOpen, setIsNavOpen] = useState(true);
@@ -53,6 +55,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/ab-testing" element={<ABTesting />} />
           <Route path="/eye-movement-patterns" element={<EyeMovementPatterns />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/overview" replace />} />
         </Routes>
       </main>

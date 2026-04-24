@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/overview.css";
 
 const ChevronDownIcon = () => (
@@ -38,24 +38,118 @@ const TrendDownIcon = () => (
 );
 
 function Overview() {
+    const [selectedEmail, setSelectedEmail] = useState("example.com");
+    const [selectedDate, setSelectedDate] = useState("May 12 - May 18, 2024");
+    const [selectedUser, setSelectedUser] = useState("All Users");
+
+    const [showEmailDropdown, setShowEmailDropdown] = useState(false);
+    const [showDateDropdown, setShowDateDropdown] = useState(false);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+    const emails = ["example.com", "website.io", "mysite.dev", "analytics.org"];
+    const dates = [
+        "May 12 - May 18, 2024",
+        "May 5 - May 11, 2024",
+        "Apr 28 - May 4, 2024",
+        "Apr 21 - Apr 27, 2024",
+    ];
+    const users = ["All Users", "New Users", "Returning Users", "Premium Users"];
+
     return (
         <div className="overview-container">
             <div className="overview-header">
                 <h1 className="overview-title">Overview</h1>
                 <div className="overview-controls">
-                    <div className="control-item">
-                        <span>example.com</span>
-                        <ChevronDownIcon />
+                    <div className="control-dropdown">
+                        <button
+                            className="control-item"
+                            onClick={() => {
+                                setShowEmailDropdown(!showEmailDropdown);
+                                setShowDateDropdown(false);
+                                setShowUserDropdown(false);
+                            }}
+                        >
+                            <span>{selectedEmail}</span>
+                            <ChevronDownIcon />
+                        </button>
+                        {showEmailDropdown && (
+                            <div className="dropdown-menu">
+                                {emails.map((email) => (
+                                    <div
+                                        key={email}
+                                        className={`dropdown-item ${selectedEmail === email ? "active" : ""}`}
+                                        onClick={() => {
+                                            setSelectedEmail(email);
+                                            setShowEmailDropdown(false);
+                                        }}
+                                    >
+                                        {email}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                    <div className="control-item">
-                        <CalendarIcon />
-                        <span>May 12 - May 18, 2024</span>
-                        <ChevronDownIcon />
+
+                    <div className="control-dropdown">
+                        <button
+                            className="control-item"
+                            onClick={() => {
+                                setShowDateDropdown(!showDateDropdown);
+                                setShowEmailDropdown(false);
+                                setShowUserDropdown(false);
+                            }}
+                        >
+                            <CalendarIcon />
+                            <span>{selectedDate}</span>
+                            <ChevronDownIcon />
+                        </button>
+                        {showDateDropdown && (
+                            <div className="dropdown-menu">
+                                {dates.map((date) => (
+                                    <div
+                                        key={date}
+                                        className={`dropdown-item ${selectedDate === date ? "active" : ""}`}
+                                        onClick={() => {
+                                            setSelectedDate(date);
+                                            setShowDateDropdown(false);
+                                        }}
+                                    >
+                                        {date}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                    <div className="control-item">
-                        <UserIcon />
-                        <span>All Users</span>
-                        <ChevronDownIcon />
+
+                    <div className="control-dropdown">
+                        <button
+                            className="control-item"
+                            onClick={() => {
+                                setShowUserDropdown(!showUserDropdown);
+                                setShowEmailDropdown(false);
+                                setShowDateDropdown(false);
+                            }}
+                        >
+                            <UserIcon />
+                            <span>{selectedUser}</span>
+                            <ChevronDownIcon />
+                        </button>
+                        {showUserDropdown && (
+                            <div className="dropdown-menu">
+                                {users.map((user) => (
+                                    <div
+                                        key={user}
+                                        className={`dropdown-item ${selectedUser === user ? "active" : ""}`}
+                                        onClick={() => {
+                                            setSelectedUser(user);
+                                            setShowUserDropdown(false);
+                                        }}
+                                    >
+                                        {user}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
