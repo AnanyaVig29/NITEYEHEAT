@@ -1,0 +1,270 @@
+/* ===== REPORTS CONTAINER ===== */
+.reports-container {
+  padding: 24px 32px;
+}
+
+.reports-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ===== REPORTS GRID ===== */
+.reports-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* ===== CARD BASE ===== */
+.reports-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.reports-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.reports-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.reports-view-all {
+  font-size: 13px;
+  color: #b46445;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.reports-view-all:hover {
+  color: #9a5338;
+}
+
+/* ===== REPORTS LIST ===== */
+.reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fdfbf7;
+  border: 1px solid #f0ebe3;
+  transition: all 0.2s ease;
+}
+
+.report-item:hover {
+  background: #f6efe6;
+  border-color: #e2dcd0;
+  transform: translateX(4px);
+}
+
+.report-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.report-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.report-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.report-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.report-pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-pdf-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+/* ===== CREATE REPORT BUTTON ===== */
+.create-report-btn {
+  margin-top: 16px;
+  padding: 14px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #c4835a, #b46445);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(180, 100, 69, 0.3);
+}
+
+.create-report-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(180, 100, 69, 0.4);
+}
+
+/* ===== USER BEHAVIOR FLOW ===== */
+.flow-card {
+  padding: 32px;
+}
+
+.flow-subtitle {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 4px 0 36px 0;
+}
+
+.flow-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+/* Main flow row */
+.flow-main-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 32px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  min-width: 130px;
+  transition: all 0.2s ease;
+}
+
+.flow-node:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.flow-path {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  font-style: italic;
+}
+
+.flow-users {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* Connectors */
+.flow-connectors {
+  display: flex;
+  justify-content: center;
+  gap: 200px;
+  position: relative;
+  height: 56px;
+}
+
+.connector-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Branch row */
+.flow-branch-row {
+  display: flex;
+  gap: 120px;
+  justify-content: center;
+}
+
+.branch-node {
+  background: #fdfbf7;
+  border-color: #e2dcd0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .flow-main-row {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .flow-arrow {
+    display: none;
+  }
+
+  .flow-branch-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .flow-connectors {
+    display: none;
+  }
+}
