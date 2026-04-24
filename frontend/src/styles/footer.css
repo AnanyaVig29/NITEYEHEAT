@@ -1,17 +1,19 @@
-/* ===== FOOTER ===== */
 .footer {
-  margin-top: 32px;
+  margin-top: auto; /* Push to bottom */
+  width: 100%;
 }
 
 /* ===== FEATURES BAR ===== */
 .footer-features {
   display: flex;
   align-items: center;
-  gap: 0;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
   background: linear-gradient(135deg, #f5f0ea, #ede6dc);
-  border-radius: 16px;
-  padding: 20px 24px;
-  border: 1px solid #e2dcd0;
+  padding: 32px;
+  border-top: 1px solid #e2dcd0;
+  width: 100%;
 }
 
 .footer-feature-item {
@@ -19,12 +21,20 @@
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 200px;
+  min-height: 72px;
   padding: 0 16px;
   border-right: 1px solid #ddd5c8;
 }
 
 .footer-feature-item:last-of-type {
   border-right: none;
+}
+
+@media (max-width: 1400px) {
+  .footer-feature-item {
+    border-right: none;
+  }
 }
 
 .footer-icon {
@@ -43,6 +53,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  text-align: left;
 }
 
 .footer-feature-text strong {
@@ -62,9 +73,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding-left: 24px;
-  min-width: 220px;
+  min-width: 240px;
+  border-left: 1px solid #ddd5c8;
+}
+
+@media (max-width: 1400px) {
+  .footer-cta {
+    border-left: none;
+    padding-left: 0;
+    width: 100%;
+    margin-top: 10px;
+  }
 }
 
 .footer-cta-text {
@@ -105,7 +126,42 @@
   text-align: center;
   padding: 14px 24px;
   font-size: 12px;
-  border-radius: 0 0 16px 16px;
-  margin-top: -8px;
-  padding-top: 22px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .footer-features {
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 16px;
+  }
+
+  .footer-feature-item {
+    border-right: none;
+    border-bottom: 1px solid #ddd5c8;
+    padding-bottom: 16px;
+    width: 100%;
+  }
+
+  .footer-feature-item:last-of-type {
+    border-bottom: none;
+  }
+
+  .footer-cta {
+    padding-left: 0;
+    margin-top: 10px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-feature-item {
+    padding: 0;
+    min-width: 0;
+  }
+
+  .footer-cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
