@@ -118,7 +118,7 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  align-self: center;
+  align-self: flex-start;
   transition: all 0.2s;
 }
 
@@ -339,12 +339,72 @@
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .alerts-grid {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 1024px) {
+  .alerts-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 900px) {
   .ux-cards-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .insight-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .insight-icon {
+    margin: 0 auto;
+  }
+
+  .insight-content {
+    width: 100%;
+    text-align: left;
+  }
+
+  .alert-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+  }
+
+  .alert-time {
+    position: static;
+    margin-top: 4px;
+    width: 100%;
+    text-align: right;
+  }
+
+  .ux-card-metrics {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .alerts-title {
+    font-size: 22px;
+  }
+  
+  .ux-section-title {
+    font-size: 16px;
+  }
+
+  .view-details-btn {
+    width: 100%;
+    text-align: center;
   }
 }
