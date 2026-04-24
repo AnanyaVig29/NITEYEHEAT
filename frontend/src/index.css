@@ -51,19 +51,24 @@
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
+@media (max-width: 1126px) {
+  #root {
+    border-inline: none;
+  }
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 
 h1,
@@ -78,8 +83,13 @@ h1 {
   letter-spacing: -1.68px;
   margin: 32px 0;
   @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+    font-size: 42px;
+    margin: 24px 0;
+  }
+  @media (max-width: 640px) {
+    font-size: 32px;
+    margin: 16px 0;
+    padding: 0 16px;
   }
 }
 h2 {
@@ -88,7 +98,11 @@ h2 {
   letter-spacing: -0.24px;
   margin: 0 0 8px;
   @media (max-width: 1024px) {
-    font-size: 20px;
+    font-size: 22px;
+  }
+  @media (max-width: 640px) {
+    font-size: 18px;
+    padding: 0 16px;
   }
 }
 p {
