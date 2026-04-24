@@ -16,6 +16,7 @@ import Analytics from "./pages/analytics";
 import Reports from "./pages/reports";
 import Alerts from "./pages/alerts";
 import ABTesting from "./pages/abtesting";
+import EyeMovementPatterns from "./pages/EyeMovementPatterns";
 // import Settings from "./pages/Settings";
 
 function App() {
@@ -31,9 +32,10 @@ function App() {
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/ab-testing" element={<ABTesting />} />
+          <Route path="/eye-movement-patterns" element={<EyeMovementPatterns />} />
+          <Route path="*" element={<Navigate to="/overview" replace />} />
           {/* <Route path="/heatmaps" element={<Heatmaps />} />
           <Route path="/sessions" element={<Sessions />} />
-          <Route path="/eye" element={<EyeTracking />} />
           <Route path="/settings" element={<Settings />} /> */}
         </Routes>
         <Footer />
