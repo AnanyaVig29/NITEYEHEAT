@@ -102,6 +102,15 @@ export default function Login() {
         .custom-checkbox.checked svg {
           display: block;
         }
+
+        @media (max-width: 480px) {
+          .login-card {
+            padding: 24px !important;
+          }
+          .login-title {
+            font-size: 24px !important;
+          }
+        }
       `}</style>
 
       {/* ===== PAGE WRAPPER ===== */}
@@ -116,14 +125,17 @@ export default function Login() {
       }}>
 
         {/* ===== CARD ===== */}
-        <div style={{
-          background: "#fff",
-          borderRadius: "24px",
-          padding: "40px",
-          width: "100%",
-          maxWidth: "420px",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.1)",
-        }}>
+        <div 
+          className="login-card"
+          style={{
+            background: "#fff",
+            borderRadius: "24px",
+            padding: "40px",
+            width: "100%",
+            maxWidth: "420px",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.1)",
+          }}
+        >
 
           {/* LOGO */}
           <div style={{
@@ -144,7 +156,7 @@ export default function Login() {
           </div>
 
           {/* HEADING */}
-          <h2 style={{ marginBottom: 10 }}>Welcome Back</h2>
+          <h2 className="login-title" style={{ marginBottom: 10 }}>Welcome Back</h2>
           <p style={{ marginBottom: 20, color: "#777" }}>Login to your account</p>
 
           {error && <p style={{ color: "red" }}>{error}</p>}

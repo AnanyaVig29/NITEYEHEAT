@@ -28,7 +28,7 @@ function ABTesting() {
                 <div className="winner-info">
                     <h3 className="winner-title">Winner: Version B (Button near headline)</h3>
                     <p className="winner-desc">
-                        Eye tracking reveals users in Version B noticed the primary CTA 3.2 seconds faster. 
+                        Eye tracking reveals users in Version B noticed the primary CTA 3.2 seconds faster.
                         In Version A, the CTA fell into a cold zone, meaning users didn't even <strong>see</strong> it before scrolling away.
                     </p>
                 </div>
@@ -65,7 +65,7 @@ function ABTesting() {
                             <div className="heat-blob heat-red" style={{ top: "40px", left: "60px", width: "120px", height: "80px" }}></div>
                             <div className="heat-blob heat-yellow" style={{ top: "50px", left: "150px", width: "90px", height: "60px" }}></div>
                             <div className="heat-blob heat-green" style={{ top: "120px", left: "40px", width: "140px", height: "40px" }}></div>
-                            
+
                             {/* Scan Path */}
                             <svg className="gaze-path">
                                 <path d="M 100 80 Q 150 70 200 90 T 120 140" fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />
@@ -133,7 +133,7 @@ function ABTesting() {
                             <div className="heat-blob heat-red" style={{ top: "35px", left: "60px", width: "160px", height: "90px" }}></div>
                             <div className="heat-blob heat-red" style={{ top: "70px", left: "100px", width: "100px", height: "60px" }}></div> {/* Intense focus on CTA */}
                             <div className="heat-blob heat-green" style={{ top: "150px", left: "40px", width: "140px", height: "40px" }}></div>
-                            
+
                             {/* Scan Path */}
                             <svg className="gaze-path">
                                 <path d="M 80 50 Q 140 60 140 90" fill="none" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4 4" />

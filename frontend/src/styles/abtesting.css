@@ -142,7 +142,6 @@
 
 .heatmap-mockup {
   width: 100%;
-  max-width: 320px;
   height: 240px;
   background: #fff;
   border-radius: 8px;
@@ -279,10 +278,56 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
+  .abtesting-container {
+    padding: 16px;
+  }
+
+  .abtesting-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .test-selector {
+    width: 100%;
+  }
+
   .ab-comparison-grid {
     grid-template-columns: 1fr;
   }
   .insights-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .winner-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .winner-icon {
+    margin: 0 auto;
+  }
+
+  .version-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .heatmap-visual {
+    padding: 14px;
+  }
+
+  .heatmap-mockup {
+    height: 210px;
+  }
+
+  .version-title {
+    font-size: 16px;
+  }
+
+  .abtesting-title {
+    font-size: 22px;
   }
 }

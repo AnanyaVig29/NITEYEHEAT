@@ -120,7 +120,7 @@ function Analytics() {
                     <h2 className="analytics-card-title">Section Engagement Trend</h2>
                     <p className="analytics-card-subtitle">Attention score progression through the page sections</p>
                     <div className="line-chart-container">
-                        <svg className="line-chart" viewBox="0 0 600 200" preserveAspectRatio="none">
+                        <svg className="line-chart" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
                             {/* Grid Lines */}
                             <line x1="0" y1="20" x2="600" y2="20" stroke="#f1f5f9" strokeWidth="1" />
                             <line x1="0" y1="80" x2="600" y2="80" stroke="#f1f5f9" strokeWidth="1" />

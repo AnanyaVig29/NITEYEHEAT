@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "../styles/EyeMovementPatterns.css";
+
 /* ─────── SVG Pattern Illustrations ─────── */
 
 const FPatternVisual = () => (
@@ -57,12 +59,12 @@ const DonutChart = ({ percent, label, color = "#b46445" }) => {
   return (
     <div className="donut-wrapper">
       <svg width={size} height={size} className="donut-svg">
-        <circle cx={size / 2} cy={size / 2} r={radius} className="donut-track" strokeWidth={strokeWidth} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          className="donut-fill"
+        <circle cx={size/2} cy={size/2} r={radius} className="donut-track" strokeWidth={strokeWidth} />
+        <circle 
+          cx={size/2} 
+          cy={size/2} 
+          r={radius} 
+          className="donut-fill" 
           stroke={color}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
