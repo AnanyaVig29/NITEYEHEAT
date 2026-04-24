@@ -159,6 +159,24 @@ export default function Login() {
           <h2 className="login-title" style={{ marginBottom: 10 }}>Welcome Back</h2>
           <p style={{ marginBottom: 20, color: "#777" }}>Login to your account</p>
 
+          <button 
+            type="button"
+            onClick={() => window.open('/demo.html', 'EyeHeatDemo', 'width=1000,height=700')}
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginBottom: "20px",
+              background: "transparent",
+              color: "#c17a50",
+              border: "2px solid #c17a50",
+              borderRadius: "8px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Launch Live Demo Dashboard
+          </button>
+
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           {/* FORM */}

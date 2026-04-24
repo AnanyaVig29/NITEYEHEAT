@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EyeHeat Demo</title>
+    <style>
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #faf9f6; color: #333; }
+        .header { background: #fff; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; font-size: 24px; color: #b46445; }
+        .main { padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .heatmap-demo { height: 300px; background: linear-gradient(135deg, rgba(255,0,0,0.2) 0%, rgba(255,255,0,0.2) 50%, rgba(0,255,0,0.2) 100%); border-radius: 8px; position: relative; overflow: hidden; }
+        .hotspot { position: absolute; background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(255,0,0,0) 70%); width: 80px; height: 80px; border-radius: 50%; opacity: 0.8; }
+        .stat { font-size: 32px; font-weight: bold; color: #b46445; }
+        .stat-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .badge { display: inline-block; padding: 4px 12px; background: #e2dcd0; border-radius: 16px; font-size: 12px; font-weight: bold; color: #b46445; margin-bottom: 20px;}
+        .close-btn { background: #b46445; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;}
+        .close-btn:hover { background: #8a4b33; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">EyeHeat Demo Analytics</div>
+        <button class="close-btn" onclick="window.close()">Close Demo Popup</button>
+    </div>
+    
+    <div class="main">
+        <div class="card">
+            <span class="badge">Live Preview</span>
+            <h2>Website Interaction Heatmap</h2>
+            <p>This is a demonstration of how EyeHeat tracks and visualizes user attention.</p>
+            <div class="heatmap-demo">
+                <div class="hotspot" style="top: 20%; left: 30%; width: 120px; height: 120px;"></div>
+                <div class="hotspot" style="top: 50%; left: 60%; background: radial-gradient(circle, rgba(255,165,0,0.8) 0%, rgba(255,165,0,0) 70%);"></div>
+                <div class="hotspot" style="top: 80%; left: 10%; width: 60px; height: 60px;"></div>
+            </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="card">
+                <div class="stat">84%</div>
+                <div class="stat-label">Attention Retention</div>
+            </div>
+            <div class="card">
+                <div class="stat">1.2s</div>
+                <div class="stat-label">Avg. Time to First Fixation</div>
+            </div>
+            <div class="card">
+                <div class="stat">High</div>
+                <div class="stat-label">Overall Engagement Score</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

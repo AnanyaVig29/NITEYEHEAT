@@ -148,6 +148,27 @@ function Navbar({ isOpen, toggleNav }) {
                     <SettingsIcon /> <span>Settings</span>
                 </NavLink>
             </div>
+            <div className="navbar-footer">
+                <div className="footer-dropdown">
+                    <GlobeIcon /> <span>example.com</span> <ChevronDownIcon />
+                </div>
+
+                <div 
+                    className="user-profile" 
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        window.location.href = "/login";
+                    }}
+                    style={{cursor: 'pointer'}}
+                    title="Click to Logout"
+                >
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=e2dcd0&color=4a3b32" alt="User" className="user-avatar" />
+                    <div className="user-info">
+                        <span className="user-name">Logout</span>
+                        <span className="user-email">End Session</span>
+                    </div>
+                </div>
+            </div>
         </nav>
     );
 }
