@@ -1,0 +1,68 @@
+/* ===== HEADER LAYOUT ===== */
+.overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+/* Title */
+.overview-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* ===== CONTROL GROUP (RIGHT SIDE) ===== */
+.overview-controls {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+/* ===== INDIVIDUAL CONTROL ===== */
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 14px;
+    height: 38px;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Icons */
+.control-item svg {
+    color: #64748b;
+}
+
+/* Hover effect (VERY IMPORTANT for premium feel) */
+.control-item:hover {
+    background: #ffffff;
+    border-color: #cbd5f5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* Active click */
+.control-item:active {
+    transform: scale(0.97);
+}
+
+/* ===== SUBTLE GROUP EFFECT ===== */
+.overview-controls {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 6px;
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    border: 1px solid #e2e8f0;
+}
