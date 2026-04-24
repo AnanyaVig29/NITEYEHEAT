@@ -111,7 +111,7 @@ function Navbar() {
                     <VideoIcon /> <span>Session Recordings</span>
                 </NavLink>
 
-                <NavLink to="/eye" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                <NavLink to="/eye-movement-patterns" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                     <EyeIcon /> <span>Eye Tracking</span>
                 </NavLink>
 
