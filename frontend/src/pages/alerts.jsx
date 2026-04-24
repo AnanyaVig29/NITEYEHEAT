@@ -1,235 +1,323 @@
 import React from "react";
+import "../styles/alerts.css";
 
+const WarningIcon = ({ color = "#f59e0b" }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+        <line x1="12" x2="12" y1="9" y2="13" />
+        <line x1="12" x2="12.01" y1="17" y2="17" />
+    </svg>
+);
 
-const clickOverview = [
-    { label: "Total Clicks", value: "48,329", change: "+14.2%", positive: true },
-    { label: "Unique Clicks", value: "31,204", change: "+9.8%", positive: true },
-    { label: "Avg. Clicks/Session", value: "3.8", change: "+5.1%", positive: true },
-    { label: "Rage Clicks", value: "1,247", change: "-22.3%", positive: true },
+const AlertCircleIcon = ({ color = "#ef4444" }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" x2="12" y1="8" y2="12" />
+        <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+);
+
+const MessageIcon = ({ color = "#ef4444" }) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+);
+
+const ZapIcon = ({ color = "#f59e0b" }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+);
+
+const CheckCircleIcon = ({ color = "#10b981" }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+);
+
+const TrendDownIcon = ({ color = "#ef4444" }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+        <polyline points="16 17 22 17 22 11" />
+    </svg>
+);
+
+const insights = [
+    {
+        severity: "High Impact",
+        severityColor: "#ef4444",
+        icon: <WarningIcon color="#ef4444" />,
+        iconBg: "#fef2f2",
+        text: "The pricing section has high attention but low engagement. Consider improving CTA visibility.",
+    },
+    {
+        severity: "Medium Impact",
+        severityColor: "#f59e0b",
+        icon: <WarningIcon color="#f59e0b" />,
+        iconBg: "#fffbeb",
+        text: "Users are not scrolling much on mobile devices. Try shorter content or better mobile layout.",
+    },
+    {
+        severity: "High Impact",
+        severityColor: "#ef4444",
+        icon: <MessageIcon color="#ef4444" />,
+        iconBg: "#fef2f2",
+        text: "The contact form is getting attention but has high drop-off rate.",
+    },
 ];
 
-const clickedElements = [
-    { element: "Get Started Button", clicks: "8,432", percentage: 72, color: "#b46445" },
-    { element: "Pricing Tab", clicks: "6,891", percentage: 58, color: "#f59e0b" },
-    { element: "Navigation Menu", clicks: "5,623", percentage: 47, color: "#3b82f6" },
-    { element: "Contact Form Submit", clicks: "4,102", percentage: 34, color: "#10b981" },
-    { element: "Footer Links", clicks: "3,456", percentage: 29, color: "#8b5cf6" },
-    { element: "Search Bar", clicks: "2,891", percentage: 24, color: "#ec4899" },
+const alerts = [
+    {
+        icon: <TrendDownIcon color="#ef4444" />,
+        iconBg: "#fef2f2",
+        title: "High Bounce Rate",
+        desc: "The bounce rate on /pricing page is 35.4%",
+        time: "2h ago",
+    },
+    {
+        icon: <ZapIcon color="#f59e0b" />,
+        iconBg: "#fffbeb",
+        title: "Low Scroll Depth",
+        desc: "Users are not scrolling past 50% on mobile",
+        time: "5h ago",
+    },
+    {
+        icon: <AlertCircleIcon color="#ef4444" />,
+        iconBg: "#fef2f2",
+        title: "Tracking Issue",
+        desc: "Some pages are missing tracking code",
+        time: "1d ago",
+    },
+    {
+        icon: <CheckCircleIcon color="#10b981" />,
+        iconBg: "#ecfdf5",
+        title: "Great Performance",
+        desc: "New CTA button test is performing well!",
+        time: "2d ago",
+    },
 ];
 
-const scrollDepth = [
-    { depth: "0-25%", users: "100%", width: 100, color: "#10b981" },
-    { depth: "25-50%", users: "78%", width: 78, color: "#3b82f6" },
-    { depth: "50-75%", users: "52%", width: 52, color: "#f59e0b" },
-    { depth: "75-100%", users: "31%", width: 31, color: "#ef4444" },
-];
-
-const sectionEngagement = [
-    { section: "Hero / Header", avgTime: "4.2s", gazeFixations: 342, clicks: "8,432", attention: 92 },
-    { section: "Features Grid", avgTime: "6.8s", gazeFixations: 521, clicks: "3,201", attention: 78 },
-    { section: "Pricing Table", avgTime: "8.1s", gazeFixations: 684, clicks: "6,891", attention: 85 },
-    { section: "Testimonials", avgTime: "3.5s", gazeFixations: 198, clicks: "1,024", attention: 45 },
-    { section: "Contact Form", avgTime: "5.6s", gazeFixations: 412, clicks: "4,102", attention: 68 },
-    { section: "Footer", avgTime: "1.2s", gazeFixations: 87, clicks: "3,456", attention: 22 },
-];
-
-const topPages = [
-    { page: "/", views: "12,842", clicks: "18,320", gazeTime: "4.2s", score: 94 },
-    { page: "/features", views: "9,842", clicks: "12,104", gazeTime: "6.8s", score: 87 },
-    { page: "/pricing", views: "6,125", clicks: "9,230", gazeTime: "8.1s", score: 82 },
-    { page: "/about", views: "3,842", clicks: "4,560", gazeTime: "3.5s", score: 65 },
-    { page: "/blog", views: "4,123", clicks: "5,890", gazeTime: "5.1s", score: 71 },
-    { page: "/contact", views: "2,156", clicks: "3,102", gazeTime: "5.6s", score: 58 },
-];
-
-function Analytics() {
+function Alerts() {
     return (
-        <div className="analytics-container">
-            <h1 className="analytics-title">Analytics</h1>
+        <div className="alerts-container">
+            <h1 className="alerts-title">Alerts</h1>
+            <div className="alerts-grid">
+                {/* AI Insights & Recommendations */}
+                <div className="alerts-card">
+                    <h2 className="alerts-card-title">AI Insights &amp; Recommendations</h2>
 
-            {/* Click Overview KPIs */}
-            <div className="analytics-kpi-grid">
-                {clickOverview.map((item, i) => (
-                    <div className="analytics-kpi" key={i}>
-                        <span className="analytics-kpi-label">{item.label}</span>
-                        <div className="analytics-kpi-row">
-                            <span className="analytics-kpi-value">{item.value}</span>
-                            <span className={`analytics-kpi-change ${item.positive ? "positive" : "negative"}`}>
-                                {item.change}
-                            </span>
-                        </div>
+                    <div className="insights-list">
+                        {insights.map((item, index) => (
+                            <div className="insight-item" key={index}>
+                                <div className="insight-icon" style={{ background: item.iconBg }}>
+                                    {item.icon}
+                                </div>
+                                <div className="insight-content">
+                                    <span className="insight-severity" style={{ color: item.severityColor }}>
+                                        • {item.severity}
+                                    </span>
+                                    <p className="insight-text">{item.text}</p>
+                                </div>
+                                <button className="view-details-btn">View Details</button>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+
+                {/* Alerts */}
+                <div className="alerts-card">
+                    <div className="alerts-card-header">
+                        <h2 className="alerts-card-title">Alerts</h2>
+                        <a href="#" className="alerts-view-all">View All Alerts</a>
+                    </div>
+
+                    <div className="alert-list">
+                        {alerts.map((alert, index) => (
+                            <div className="alert-item" key={index}>
+                                <div className="alert-icon" style={{ background: alert.iconBg }}>
+                                    {alert.icon}
+                                </div>
+                                <div className="alert-content">
+                                    <span className="alert-title">{alert.title}</span>
+                                    <span className="alert-desc">{alert.desc}</span>
+                                </div>
+                                <span className="alert-time">{alert.time}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Bento Grid */}
-            <div className="analytics-bento">
+            {/* UI/UX Improvement Suggestions */}
+            <div className="ux-section">
+                <h2 className="ux-section-title">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b46445" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                    </svg>
+                    UI/UX Improvement Suggestions
+                </h2>
+                <p className="ux-section-subtitle">Based on eye tracking patterns and user behavior analysis</p>
 
-                {/* Clicked Elements */}
-                <div className="analytics-card card-clicked-elements">
-                    <h2 className="analytics-card-title">Most Clicked Elements</h2>
-                    <div className="clicked-list">
-                        {clickedElements.map((el, i) => (
-                            <div className="clicked-item" key={i}>
-                                <div className="clicked-info">
-                                    <span className="clicked-rank">#{i + 1}</span>
-                                    <span className="clicked-name">{el.element}</span>
-                                    <span className="clicked-count">{el.clicks}</span>
-                                </div>
-                                <div className="clicked-bar-bg">
-                                    <div
-                                        className="clicked-bar-fill"
-                                        style={{ width: `${el.percentage}%`, background: el.color }}
-                                    ></div>
-                                </div>
+                <div className="ux-cards-grid">
+
+                    <div className="ux-card priority-high">
+                        <div className="ux-card-badge high">Critical</div>
+                        <h3 className="ux-card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            CTA Button Visibility
+                        </h3>
+                        <p className="ux-card-desc">
+                            Eye tracking shows users look at the hero section but miss the primary CTA button. 
+                            Only 18% of gaze fixations land on the button area.
+                        </p>
+                        <div className="ux-card-suggestions">
+                            <span className="suggestion-label">Suggestions:</span>
+                            <ul>
+                                <li>Increase button size by 30% and use a contrasting color</li>
+                                <li>Add whitespace around the CTA to draw attention</li>
+                                <li>Use directional cues (arrows, images looking at CTA)</li>
+                            </ul>
+                        </div>
+                        <div className="ux-card-metrics">
+                            <div className="metric">
+                                <span className="metric-value">18%</span>
+                                <span className="metric-label">Gaze fixation</span>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Scroll Depth Pie Chart */}
-                <div className="analytics-card card-scroll-depth">
-                    <h2 className="analytics-card-title">Scroll Depth Analysis</h2>
-                    <p className="analytics-card-subtitle">Distribution of user scroll depths</p>
-                    
-                    <div className="scroll-pie-container">
-                        <svg viewBox="0 0 36 36" className="scroll-pie-chart">
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f1f5f9" strokeWidth="6"></circle>
-                            {/* 75-100% (31%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#ef4444" strokeWidth="6" strokeDasharray="31 69" strokeDashoffset="25"></circle>
-                            {/* 50-75% (21%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f59e0b" strokeWidth="6" strokeDasharray="21 79" strokeDashoffset="-6"></circle>
-                            {/* 25-50% (26%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#3b82f6" strokeWidth="6" strokeDasharray="26 74" strokeDashoffset="-27"></circle>
-                            {/* 0-25% (22%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#10b981" strokeWidth="6" strokeDasharray="22 78" strokeDashoffset="-53"></circle>
-                            <text x="18" y="18" className="pie-center-text" dominantBaseline="middle" textAnchor="middle">Scroll</text>
-                        </svg>
-                        
-                        <div className="scroll-pie-legend">
-                            <div className="legend-item"><span className="legend-color" style={{background: "#ef4444"}}></span> 75-100% (Footer & Contact) - 31%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#f59e0b"}}></span> 50-75% (Testimonials) - 21%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#3b82f6"}}></span> 25-50% (Pricing Table) - 26%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#10b981"}}></span> 0-25% (Hero & Features) - 22%</div>
+                            <div className="metric">
+                                <span className="metric-value">2.1s</span>
+                                <span className="metric-label">Avg. time to notice</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">4.3%</span>
+                                <span className="metric-label">Click-through rate</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Section Engagement Line Chart */}
-                <div className="analytics-card card-section-engagement">
-                    <h2 className="analytics-card-title">Section Engagement Trend</h2>
-                    <p className="analytics-card-subtitle">Attention score progression through the page sections</p>
-                    <div className="line-chart-container">
-                        <svg className="line-chart" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
-                            {/* Grid Lines */}
-                            <line x1="0" y1="20" x2="600" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="80" x2="600" y2="80" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="140" x2="600" y2="140" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="200" x2="600" y2="200" stroke="#f1f5f9" strokeWidth="1" />
-                            
-                            {/* Data Line (Attention Score mapped to Y: 200 - (score * 1.8)) */}
-                            {/* Points: 
-                                Hero: 92 -> Y: 34 
-                                Features: 78 -> Y: 60 
-                                Pricing: 85 -> Y: 47 
-                                Testimonials: 45 -> Y: 119
-                                Contact: 68 -> Y: 78
-                                Footer: 22 -> Y: 160
-                            */}
-                            <path 
-                                d="M 50 34 L 150 60 L 250 47 L 350 119 L 450 78 L 550 160" 
-                                fill="none" 
-                                stroke="#b46445" 
-                                strokeWidth="4"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                            
-                            {/* Area under the curve */}
-                            <path 
-                                d="M 50 200 L 50 34 L 150 60 L 250 47 L 350 119 L 450 78 L 550 160 L 550 200 Z" 
-                                fill="url(#lineGradient)" 
-                                opacity="0.3"
-                            />
-                            
-                            {/* Data Points */}
-                            <circle cx="50" cy="34" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="150" cy="60" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="250" cy="47" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="350" cy="119" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="450" cy="78" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="550" cy="160" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-
-                            <defs>
-                                <linearGradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
-                                    <stop offset="0%" stopColor="#b46445" stopOpacity="1" />
-                                    <stop offset="100%" stopColor="#b46445" stopOpacity="0" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        {/* X Axis Labels */}
-                        <div className="line-chart-labels">
-                            <span>Hero</span>
-                            <span>Features</span>
-                            <span>Pricing</span>
-                            <span>Tests</span>
-                            <span>Contact</span>
-                            <span>Footer</span>
+                    <div className="ux-card priority-medium">
+                        <div className="ux-card-badge medium">Important</div>
+                        <h3 className="ux-card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                <line x1="3" x2="21" y1="9" y2="9" />
+                                <line x1="9" x2="9" y1="21" y2="9" />
+                            </svg>
+                            Navigation Layout
+                        </h3>
+                        <p className="ux-card-desc">
+                            Heatmap data reveals users scan the top navigation in an F-pattern but 
+                            frequently miss the last 2 menu items. Dropdown menus receive very low attention.
+                        </p>
+                        <div className="ux-card-suggestions">
+                            <span className="suggestion-label">Suggestions:</span>
+                            <ul>
+                                <li>Reduce navigation items to 5-6 max</li>
+                                <li>Group related items under mega menus</li>
+                                <li>Highlight the most important links with visual weight</li>
+                            </ul>
+                        </div>
+                        <div className="ux-card-metrics">
+                            <div className="metric">
+                                <span className="metric-value">72%</span>
+                                <span className="metric-label">F-pattern match</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">0.8s</span>
+                                <span className="metric-label">Avg. nav scan time</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">12%</span>
+                                <span className="metric-label">Dropdown usage</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Top Pages */}
-                <div className="analytics-card card-top-pages">
-                    <h2 className="analytics-card-title">Top Pages (Eye Tracking + Clicks)</h2>
-                    <p className="analytics-card-subtitle">Pages ranked by combined user engagement</p>
-                    <div className="top-pages-list">
-                        {topPages.map((page, i) => (
-                            <div className="top-page-item" key={i}>
-                                <div className="top-page-rank">
-                                    <span className={`rank-badge ${i < 3 ? "top" : ""}`}>{i + 1}</span>
-                                </div>
-                                <div className="top-page-info">
-                                    <span className="top-page-path">{page.page}</span>
-                                    <div className="top-page-stats">
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                                            {page.views}
-                                        </span>
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" /></svg>
-                                            {page.clicks}
-                                        </span>
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                            {page.gazeTime}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="top-page-score">
-                                    <svg className="score-ring" viewBox="0 0 36 36">
-                                        <path
-                                            className="score-ring-bg"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        />
-                                        <path
-                                            className="score-ring-fill"
-                                            strokeDasharray={`${page.score}, 100`}
-                                            style={{ stroke: page.score >= 80 ? "#10b981" : page.score >= 60 ? "#f59e0b" : "#ef4444" }}
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        />
-                                        <text x="18" y="20.35" className="score-text">{page.score}</text>
-                                    </svg>
-                                </div>
+                    <div className="ux-card priority-medium">
+                        <div className="ux-card-badge medium">Important</div>
+                        <h3 className="ux-card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <path d="M16 13H8" />
+                                <path d="M16 17H8" />
+                            </svg>
+                            Content Hierarchy
+                        </h3>
+                        <p className="ux-card-desc">
+                            Users spend 65% of viewing time above the fold. Key information like pricing 
+                            and testimonials placed below fold receive minimal eye fixations.
+                        </p>
+                        <div className="ux-card-suggestions">
+                            <span className="suggestion-label">Suggestions:</span>
+                            <ul>
+                                <li>Move social proof (testimonials) above the fold</li>
+                                <li>Add scroll indicators to encourage exploration</li>
+                                <li>Use visual anchors to guide eye flow downward</li>
+                            </ul>
+                        </div>
+                        <div className="ux-card-metrics">
+                            <div className="metric">
+                                <span className="metric-value">65%</span>
+                                <span className="metric-label">Above-fold time</span>
                             </div>
-                        ))}
+                            <div className="metric">
+                                <span className="metric-value">35%</span>
+                                <span className="metric-label">Scroll depth</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">8%</span>
+                                <span className="metric-label">Below-fold clicks</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
+                    <div className="ux-card priority-low">
+                        <div className="ux-card-badge low">Suggestion</div>
+                        <h3 className="ux-card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                            </svg>
+                            Form Design &amp; UX
+                        </h3>
+                        <p className="ux-card-desc">
+                            Eye tracking shows users hesitate at the contact form. Gaze patterns indicate 
+                            confusion — users look back and forth between fields. Drop-off is 48% at form start.
+                        </p>
+                        <div className="ux-card-suggestions">
+                            <span className="suggestion-label">Suggestions:</span>
+                            <ul>
+                                <li>Reduce form fields from 8 to 4 essential ones</li>
+                                <li>Add inline validation and progress indicators</li>
+                                <li>Use autofill and smart defaults to reduce effort</li>
+                            </ul>
+                        </div>
+                        <div className="ux-card-metrics">
+                            <div className="metric">
+                                <span className="metric-value">48%</span>
+                                <span className="metric-label">Form drop-off</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">3.2s</span>
+                                <span className="metric-label">Avg. hesitation</span>
+                            </div>
+                            <div className="metric">
+                                <span className="metric-value">6</span>
+                                <span className="metric-label">Back-glances</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     );
 }
 
-export default Analytics;
+export default Alerts;
