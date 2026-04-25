@@ -24,7 +24,6 @@
   min-width: 200px;
   min-height: 72px;
   padding: 0 16px;
-  border-right: 1px solid #ddd5c8;
 }
 
 .footer-feature-item:last-of-type {
@@ -76,7 +75,6 @@
   gap: 12px;
   padding-left: 24px;
   min-width: 240px;
-  border-left: 1px solid #ddd5c8;
 }
 
 @media (max-width: 1400px) {

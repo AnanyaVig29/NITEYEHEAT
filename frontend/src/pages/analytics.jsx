@@ -1,245 +1,224 @@
 import React, { useState } from "react";
+import { 
+    Eye, 
+    Flame, 
+    Clock, 
+    Target, 
+    Navigation, 
+    Layers, 
+    Brain, 
+    LayoutTemplate, 
+    MonitorSmartphone,
+    TrendingUp,
+    AlertCircle,
+    ChevronRight,
+    BarChart3
+} from "lucide-react";
 import "../styles/analytics.css";
 
+const ANALYTICS_SECTIONS = [
+    { 
+        id: "gaze", 
+        label: "Gaze-Based Analytics", 
+        icon: Eye, 
+        description: "The foundation of eye tracking: Fixations, Saccades, and Scanpaths.",
+        metrics: [
+            { label: "Fixations", value: "12.8k", sub: "Where users stop and focus", status: "stable" },
+            { label: "Saccades", value: "8.3k", sub: "Quick eye movements between points", status: "rising" },
+            { label: "Scanpaths", value: "142", sub: "Full journeys of eye movement", status: "stable" }
+        ]
+    },
+    { 
+        id: "heatmap", 
+        label: "Heatmap Analytics", 
+        icon: Flame, 
+        description: "Visual representation of attention, clicks, and scroll depth.",
+        metrics: [
+            { label: "Attention", value: "84%", sub: "Red = most viewed areas", status: "rising" },
+            { label: "Clicks", value: "2.4k", sub: "Where users actually click", status: "stable" },
+            { label: "Scroll", value: "62%", sub: "Average page depth reached", status: "falling" }
+        ]
+    },
+    { 
+        id: "time", 
+        label: "Time-Based Analytics", 
+        icon: Clock, 
+        description: "Focus on duration and engagement metrics like TTFF and Dwell Time.",
+        metrics: [
+            { label: "TTFF", value: "340ms", sub: "Time to First Fixation", status: "good" },
+            { label: "Dwell Time", value: "3.2s", sub: "Avg time spent on elements", status: "rising" },
+            { label: "Total View", value: "24m", sub: "Total viewing time", status: "stable" }
+        ]
+    },
+    { 
+        id: "aoi", 
+        label: "Area of Interest (AOI)", 
+        icon: Target, 
+        description: "Metrics for defined sections like buttons, images, and text blocks.",
+        metrics: [
+            { label: "AOI Count", value: "6", sub: "Defined focus regions", status: "stable" },
+            { label: "Avg Focus", value: "4.1s", sub: "Time spent per section", status: "rising" },
+            { label: "Entry Pt", value: "Hero", sub: "Most common landing zone", status: "fixed" }
+        ]
+    },
+    { 
+        id: "nav", 
+        label: "Navigation & Behavior", 
+        icon: Navigation, 
+        description: "Pattern detection (F/Z patterns) and visual journey mapping.",
+        metrics: [
+            { label: "F-Pattern", value: "72%", sub: "Reading behavior alignment", status: "stable" },
+            { label: "Drop-off", value: "14%", sub: "Ignored area percentage", status: "falling" },
+            { label: "Landings", value: "Top-L", sub: "Where eyes land first", status: "fixed" }
+        ]
+    },
+    { 
+        id: "comp", 
+        label: "Comparative Analytics", 
+        icon: Layers, 
+        description: "A/B testing results and cross-version performance comparison.",
+        metrics: [
+            { label: "Winner", value: "Ver B", sub: "Top performing version", status: "rising" },
+            { label: "Lift", value: "+18%", sub: "Improvement in attention", status: "rising" },
+            { label: "Confidence", value: "95%", sub: "Statistical significance", status: "good" }
+        ]
+    },
+    { 
+        id: "cognitive", 
+        label: "Cognitive Load", 
+        icon: Brain, 
+        description: "Measures mental effort through pupil dilation and scanning patterns.",
+        metrics: [
+            { label: "Effort", value: "Low", sub: "Pupil dilation index", status: "good" },
+            { label: "Confuse", value: "12%", sub: "Repeated scanning detected", status: "falling" },
+            { label: "Smooth", value: "88%", sub: "Visual flow effectiveness", status: "stable" }
+        ]
+    },
+    { 
+        id: "ux", 
+        label: "UI/UX Performance", 
+        icon: LayoutTemplate, 
+        description: "Visual hierarchy effectiveness and CTA visibility scores.",
+        metrics: [
+            { label: "CTA Score", value: "9.2", sub: "Visibility effectiveness", status: "rising" },
+            { label: "Hierarchy", value: "Optimal", sub: "Visual flow score", status: "good" },
+            { label: "Engage", value: "High", sub: "Content engagement score", status: "rising" }
+        ]
+    },
+    { 
+        id: "device", 
+        label: "Device & Context", 
+        icon: MonitorSmartphone, 
+        description: "Behavioral changes across Desktop, Mobile, and Tablet.",
+        metrics: [
+            { label: "Mobile Focus", value: "Top-C", sub: "Primary mobile landing", status: "stable" },
+            { label: "Screen Gap", value: "8%", sub: "Pattern diff between devices", status: "falling" },
+            { label: "Res Impact", value: "Med", sub: "Resolution based differences", status: "stable" }
+        ]
+    }
+];
+
 const Analytics = () => {
-  const [activeTab, setActiveTab] = useState("gaze");
-  const [heatmapType, setHeatmapType] = useState("attention");
+    const [activeSection, setActiveSection] = useState("gaze");
 
-  // Gaze-Based Analytics Data
-  const gazeMetrics = [
-    { label: "Total Fixations", value: "12,847", change: "+8.2%", icon: "👁️" },
-    { label: "Avg. Fixation Duration", value: "285ms", change: "+12.1%", icon: "⏱️" },
-    { label: "Saccade Count", value: "8,341", change: "+5.3%", icon: "➡️" },
-    { label: "Scanpath Length", value: "2,847px", change: "+3.1%", icon: "🧭" },
-  ];
+    const currentSection = ANALYTICS_SECTIONS.find(s => s.id === activeSection);
 
-  // Time-Based Analytics
-  const timeMetrics = [
-    { label: "TTFF (Time to First Fixation)", value: "342ms", target: "< 500ms", status: "good" },
-    { label: "Dwell Time (Avg)", value: "3.2s", target: "> 2s", status: "good" },
-    { label: "Total Viewing Time", value: "28:43", sessions: "2,341", status: "good" },
-    { label: "Engagement Score", value: "8.7/10", previous: "7.9/10", status: "good" },
-  ];
+    return (
+        <div className="analytics-hub">
+            <aside className="analytics-sidebar">
+                <div className="sidebar-header">
+                    <BarChart3 size={20} className="text-primary" />
+                    <h2>Analytics Hub</h2>
+                </div>
+                <nav className="sidebar-nav">
+                    {ANALYTICS_SECTIONS.map((section) => (
+                        <button
+                            key={section.id}
+                            className={`nav-btn ${activeSection === section.id ? "active" : ""}`}
+                            onClick={() => setActiveSection(section.id)}
+                        >
+                            <section.icon size={18} />
+                            <span>{section.label}</span>
+                            {activeSection === section.id && <ChevronRight size={14} className="ml-auto" />}
+                        </button>
+                    ))}
+                </nav>
+            </aside>
 
-  // AOI Analytics
-  const aoiData = [
-    { name: "CTA Button", fixations: 487, dwellTime: "4.2s", attention: 94 },
-    { name: "Hero Image", fixations: 623, dwellTime: "5.8s", attention: 89 },
-    { name: "Navigation Menu", fixations: 234, dwellTime: "2.1s", attention: 76 },
-    { name: "Footer", fixations: 87, dwellTime: "0.8s", attention: 22 },
-  ];
-
-  // Heatmap Types Data
-  const heatmapTypes = {
-    attention: { description: "Attention Heatmap - Where users look the most", color: "red" },
-    click: { description: "Click Heatmap - Where users click/tap", color: "blue" },
-    scroll: { description: "Scroll Heatmap - How far users scroll", color: "green" },
-    aoi: { description: "AOI Heatmap - Attention in defined areas", color: "orange" },
-    cognitive: { description: "Cognitive Load - User effort/difficulty", color: "purple" },
-  };
-
-  // Comparative Data (A/B Testing)
-  const comparativeData = [
-    { metric: "Avg Attention Score", versionA: 78, versionB: 85, winner: "B" },
-    { metric: "TTFF (Lower is Better)", versionA: 512, versionB: 384, winner: "B" },
-    { metric: "Dwell Time", versionA: "2.8s", versionB: "3.5s", winner: "B" },
-    { metric: "Click Conversion", versionA: "2.3%", versionB: "4.1%", winner: "B" },
-  ];
-
-  // Device/Platform Analytics
-  const deviceAnalytics = [
-    { device: "Desktop", sessions: "5,234", attention: 86, ttff: "298ms", dwellTime: "4.2s" },
-    { device: "Tablet", sessions: "2,847", attention: 72, ttff: "425ms", dwellTime: "3.1s" },
-    { device: "Mobile", sessions: "3,156", attention: 68, ttff: "587ms", dwellTime: "2.8s" },
-  ];
-
-  return (
-    <div className="analytics-container">
-            <h1 className="analytics-title">Analytics</h1>
-
-            {/* Click Overview KPIs */}
-            <div className="analytics-kpi-grid">
-                {clickOverview.map((item, i) => (
-                    <div className="analytics-kpi" key={i}>
-                        <span className="analytics-kpi-label">{item.label}</span>
-                        <div className="analytics-kpi-row">
-                            <span className="analytics-kpi-value">{item.value}</span>
-                            <span className={`analytics-kpi-change ${item.positive ? "positive" : "negative"}`}>
-                                {item.change}
-                            </span>
+            <main className="analytics-content">
+                <header className="content-header">
+                    <div className="header-info">
+                        <div className="icon-badge">
+                            <currentSection.icon size={24} />
+                        </div>
+                        <div>
+                            <h1>{currentSection.label}</h1>
+                            <p>{currentSection.description}</p>
                         </div>
                     </div>
-                ))}
-            </div>
+                    <div className="header-actions">
+                        <button className="export-btn">Export Report</button>
+                        <button className="time-btn">Last 30 Days</button>
+                    </div>
+                </header>
 
-            {/* Bento Grid */}
-            <div className="analytics-bento">
-
-                {/* Clicked Elements */}
-                <div className="analytics-card card-clicked-elements">
-                    <h2 className="analytics-card-title">Most Clicked Elements</h2>
-                    <div className="clicked-list">
-                        {clickedElements.map((el, i) => (
-                            <div className="clicked-item" key={i}>
-                                <div className="clicked-info">
-                                    <span className="clicked-rank">#{i + 1}</span>
-                                    <span className="clicked-name">{el.element}</span>
-                                    <span className="clicked-count">{el.clicks}</span>
-                                </div>
-                                <div className="clicked-bar-bg">
-                                    <div
-                                        className="clicked-bar-fill"
-                                        style={{ width: `${el.percentage}%`, background: el.color }}
-                                    ></div>
-                                </div>
+                <div className="metrics-grid">
+                    {currentSection.metrics.map((metric, i) => (
+                        <div className="metric-card" key={i}>
+                            <div className="metric-header">
+                                <span className="metric-label">{metric.label}</span>
+                                <TrendingUp size={16} className={`status-icon ${metric.status}`} />
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Scroll Depth Pie Chart */}
-                <div className="analytics-card card-scroll-depth">
-                    <h2 className="analytics-card-title">Scroll Depth Analysis</h2>
-                    <p className="analytics-card-subtitle">Distribution of user scroll depths</p>
-                    
-                    <div className="scroll-pie-container">
-                        <svg viewBox="0 0 36 36" className="scroll-pie-chart">
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f1f5f9" strokeWidth="6"></circle>
-                            {/* 75-100% (31%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#ef4444" strokeWidth="6" strokeDasharray="31 69" strokeDashoffset="25"></circle>
-                            {/* 50-75% (21%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f59e0b" strokeWidth="6" strokeDasharray="21 79" strokeDashoffset="-6"></circle>
-                            {/* 25-50% (26%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#3b82f6" strokeWidth="6" strokeDasharray="26 74" strokeDashoffset="-27"></circle>
-                            {/* 0-25% (22%) */}
-                            <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#10b981" strokeWidth="6" strokeDasharray="22 78" strokeDashoffset="-53"></circle>
-                            <text x="18" y="18" className="pie-center-text" dominantBaseline="middle" textAnchor="middle">Scroll</text>
-                        </svg>
-                        
-                        <div className="scroll-pie-legend">
-                            <div className="legend-item"><span className="legend-color" style={{background: "#ef4444"}}></span> 75-100% (Footer & Contact) - 31%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#f59e0b"}}></span> 50-75% (Testimonials) - 21%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#3b82f6"}}></span> 25-50% (Pricing Table) - 26%</div>
-                            <div className="legend-item"><span className="legend-color" style={{background: "#10b981"}}></span> 0-25% (Hero & Features) - 22%</div>
+                            <div className="metric-value">{metric.value}</div>
+                            <div className="metric-sub">{metric.sub}</div>
                         </div>
-                    </div>
+                    ))}
                 </div>
 
-                {/* Section Engagement Line Chart */}
-                <div className="analytics-card card-section-engagement">
-                    <h2 className="analytics-card-title">Section Engagement Trend</h2>
-                    <p className="analytics-card-subtitle">Attention score progression through the page sections</p>
-                    <div className="line-chart-container">
-                        <svg className="line-chart" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
-                            {/* Grid Lines */}
-                            <line x1="0" y1="20" x2="600" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="80" x2="600" y2="80" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="140" x2="600" y2="140" stroke="#f1f5f9" strokeWidth="1" />
-                            <line x1="0" y1="200" x2="600" y2="200" stroke="#f1f5f9" strokeWidth="1" />
-                            
-                            {/* Data Line (Attention Score mapped to Y: 200 - (score * 1.8)) */}
-                            {/* Points: 
-                                Hero: 92 -> Y: 34 
-                                Features: 78 -> Y: 60 
-                                Pricing: 85 -> Y: 47 
-                                Testimonials: 45 -> Y: 119
-                                Contact: 68 -> Y: 78
-                                Footer: 22 -> Y: 160
-                            */}
-                            <path 
-                                d="M 50 34 L 150 60 L 250 47 L 350 119 L 450 78 L 550 160" 
-                                fill="none" 
-                                stroke="#b46445" 
-                                strokeWidth="4"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                            
-                            {/* Area under the curve */}
-                            <path 
-                                d="M 50 200 L 50 34 L 150 60 L 250 47 L 350 119 L 450 78 L 550 160 L 550 200 Z" 
-                                fill="url(#lineGradient)" 
-                                opacity="0.3"
-                            />
-                            
-                            {/* Data Points */}
-                            <circle cx="50" cy="34" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="150" cy="60" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="250" cy="47" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="350" cy="119" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="450" cy="78" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-                            <circle cx="550" cy="160" r="6" fill="#fff" stroke="#b46445" strokeWidth="3" />
-
-                            <defs>
-                                <linearGradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
-                                    <stop offset="0%" stopColor="#b46445" stopOpacity="1" />
-                                    <stop offset="100%" stopColor="#b46445" stopOpacity="0" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        {/* X Axis Labels */}
-                        <div className="line-chart-labels">
-                            <span>Hero</span>
-                            <span>Features</span>
-                            <span>Pricing</span>
-                            <span>Tests</span>
-                            <span>Contact</span>
-                            <span>Footer</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Top Pages */}
-                <div className="analytics-card card-top-pages">
-                    <h2 className="analytics-card-title">Top Pages (Eye Tracking + Clicks)</h2>
-                    <p className="analytics-card-subtitle">Pages ranked by combined user engagement</p>
-                    <div className="top-pages-list">
-                        {topPages.map((page, i) => (
-                            <div className="top-page-item" key={i}>
-                                <div className="top-page-rank">
-                                    <span className={`rank-badge ${i < 3 ? "top" : ""}`}>{i + 1}</span>
-                                </div>
-                                <div className="top-page-info">
-                                    <span className="top-page-path">{page.page}</span>
-                                    <div className="top-page-stats">
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                                            {page.views}
-                                        </span>
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" /></svg>
-                                            {page.clicks}
-                                        </span>
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                            {page.gazeTime}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="top-page-score">
-                                    <svg className="score-ring" viewBox="0 0 36 36">
-                                        <path
-                                            className="score-ring-bg"
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        />
-                                        <path
-                                            className="score-ring-fill"
-                                            strokeDasharray={`${page.score}, 100`}
-                                            style={{ stroke: page.score >= 80 ? "#10b981" : page.score >= 60 ? "#f59e0b" : "#ef4444" }}
-                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                        />
-                                        <text x="18" y="20.35" className="score-text">{page.score}</text>
-                                    </svg>
-                                </div>
+                <div className="visualization-area">
+                    <div className="viz-card">
+                        <div className="viz-header">
+                            <h3>Engagement Distribution</h3>
+                            <div className="viz-controls">
+                                <span>Day</span>
+                                <span>Week</span>
+                                <span className="active">Month</span>
                             </div>
-                        ))}
+                        </div>
+                        <div className="mock-chart">
+                            {/* SVG Chart Placeholder */}
+                            <svg width="100%" height="200" viewBox="0 0 800 200">
+                                <path 
+                                    d="M0,150 Q100,100 200,130 T400,80 T600,120 T800,50" 
+                                    fill="none" 
+                                    stroke="#b46445" 
+                                    strokeWidth="3" 
+                                />
+                                <path 
+                                    d="M0,150 Q100,100 200,130 T400,80 T600,120 T800,50 V200 H0 Z" 
+                                    fill="rgba(180, 100, 69, 0.1)" 
+                                />
+                                <circle cx="400" cy="80" r="4" fill="#b46445" />
+                                <text x="410" y="75" fill="#666" fontSize="12">Peak Interest</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="insight-card">
+                        <div className="insight-header">
+                            <AlertCircle size={18} />
+                            <h3>Key Insights</h3>
+                        </div>
+                        <ul className="insight-list">
+                            <li>Users are noticing the primary CTA {activeSection === "time" ? "faster than average (340ms)" : "consistently within the first 2 seconds"}.</li>
+                            <li>The F-pattern reading style is dominant, suggesting top-left content is critical.</li>
+                            <li>Significant drop-off observed after the pricing section on mobile devices.</li>
+                        </ul>
                     </div>
                 </div>
-
-            </div>
+            </main>
         </div>
     );
-}
+};
 
 export default Analytics;

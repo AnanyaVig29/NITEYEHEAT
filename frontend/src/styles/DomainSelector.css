@@ -1,0 +1,107 @@
+.domain-selector-container {
+    position: relative;
+    z-index: 101;
+}
+
+.domain-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.2rem;
+    background: #fff;
+    border: 1px solid #e2dcd0;
+    border-radius: 10px;
+    color: #4a3b32;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.domain-trigger:hover {
+    background: #fdfbf7;
+    border-color: #b46445;
+}
+
+.domain-trigger .chevron {
+    transition: transform 0.2s ease;
+    margin-left: 0.25rem;
+    opacity: 0.5;
+}
+
+.domain-trigger .chevron.open {
+    transform: rotate(180deg);
+}
+
+.domain-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 220px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.domain-list {
+    padding: 0.5rem;
+}
+
+.domain-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0.85rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.domain-item:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.domain-item.active {
+    background: #fdfbf7;
+    color: #b46445;
+}
+
+.domain-footer {
+    border-top: 1px solid #f1f5f9;
+    padding: 0.5rem;
+}
+
+.add-domain-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    border: none;
+    background: transparent;
+    color: #b46445;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.add-domain-btn:hover {
+    background: rgba(180, 100, 69, 0.05);
+}

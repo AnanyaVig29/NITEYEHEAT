@@ -117,7 +117,7 @@ function Navbar({ isOpen, toggleNav }) {
                 </NavLink>
 
                 <NavLink to="/heatmaps" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-                    <HeatmapIcon /> <span>Heatmaps</span> <ChevronDownIcon />
+                    <HeatmapIcon /> <span>Heatmaps</span>
                 </NavLink>
 
                 <NavLink to="/sessions" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
@@ -129,7 +129,7 @@ function Navbar({ isOpen, toggleNav }) {
                 </NavLink>
 
                 <NavLink to="/analytics" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-                    <ChartIcon /> <span>Analytics</span> <ChevronDownIcon />
+                    <ChartIcon /> <span>Analytics</span>
                 </NavLink>
 
                 <NavLink to="/ab-testing" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
