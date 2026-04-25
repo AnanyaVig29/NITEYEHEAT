@@ -15,6 +15,7 @@ app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/gaze', gazeRoutes);
 app.use('/api/sessions', sessionRoutes);
+app.use('/api/auth', require('./routes/auth'));
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });

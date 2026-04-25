@@ -1,12 +1,20 @@
 /* ===== REPORTS CONTAINER ===== */
 .reports-container {
-  padding: 24px 32px;
+  padding: 32px 36px;
+  background: #fdfbf7;
+  min-height: 100vh;
 }
 
 .reports-title {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 16px;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #2c2420;
+  margin-bottom: 6px;
+}
+
+.reports-container .page-subtitle {
+  margin-bottom: 24px;
 }
 
 /* ===== REPORTS GRID ===== */
@@ -24,6 +32,7 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 26px rgba(44, 36, 32, 0.04);
 }
 
 .reports-card-header {
@@ -124,6 +133,41 @@
   background: #f8fafc;
   border-color: #cbd5e1;
   color: #334155;
+}
+
+@media (max-width: 1024px) {
+  .reports-container {
+    padding: 24px 28px;
+  }
+
+  .reports-title {
+    font-size: 30px;
+  }
+
+  .flow-card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .reports-container {
+    padding: 18px 20px;
+  }
+
+  .reports-card,
+  .flow-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports-container {
+    padding: 14px 16px;
+  }
+
+  .reports-title {
+    font-size: 24px;
+  }
 }
 
 /* ===== CREATE REPORT BUTTON ===== */

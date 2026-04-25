@@ -14,10 +14,14 @@
 }
 
 .emp-header h1 {
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 800;
-  color: #1e293b;
+  color: #2c2420;
   margin: 0;
+}
+
+.emp-subtitle {
+  max-width: 620px;
 }
 
 .emp-view-all-btn {
@@ -207,6 +211,7 @@
   gap: 16px;
   transition: all 0.3s ease;
   text-align: center;
+  box-shadow: 0 10px 26px rgba(44, 36, 32, 0.04);
 }
 
 .emp-pattern-card:hover {
@@ -229,6 +234,13 @@
   font-weight: 700;
   color: #1e293b;
   margin: 0;
+}
+
+.emp-section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2c2420;
+  margin-bottom: 32px;
 }
 
 /* ===== STATS SECTION ===== */
@@ -323,6 +335,55 @@
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.8px;
+
+@media (max-width: 1024px) {
+  .emp-page {
+    padding: 24px;
+  }
+
+  .emp-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .emp-header h1 {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .emp-page {
+    padding: 18px 20px;
+  }
+
+  .emp-patterns-grid,
+  .emp-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-stats-section {
+    padding: 22px;
+  }
+
+  .emp-pattern-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .emp-page {
+    padding: 14px 16px;
+  }
+
+  .emp-header h1 {
+    font-size: 24px;
+  }
+
+  .emp-section-title {
+    font-size: 18px;
+  }
+}
 }
 
 /* ===== RESPONSIVE ===== */

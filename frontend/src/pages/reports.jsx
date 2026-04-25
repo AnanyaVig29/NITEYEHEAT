@@ -60,7 +60,8 @@ const branchNodes = [
 function Reports() {
     return (
         <div className="reports-container">
-            <h1 className="reports-title">Reports</h1>
+            <h1 className="page-title reports-title">Reports</h1>
+            <p className="page-subtitle">Review weekly summaries, behavior flow, and export-ready documents.</p>
 
             <div className="reports-grid">
                 {/* Reports List Card */}

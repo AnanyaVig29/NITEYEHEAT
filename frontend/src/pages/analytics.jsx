@@ -145,6 +145,7 @@ const Analytics = () => {
                 </nav>
             </aside>
 
+<<<<<<< HEAD
             <main className="analytics-content">
                 <header className="content-header">
                     <div className="header-info">

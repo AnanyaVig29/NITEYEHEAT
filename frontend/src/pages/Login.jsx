@@ -159,6 +159,38 @@ export default function Login() {
           <h2 className="login-title" style={{ marginBottom: 10 }}>Welcome Back</h2>
           <p style={{ marginBottom: 20, color: "#777" }}>Login to your account</p>
 
+          {/* DEMO CREDENTIALS */}
+          <div style={{
+            background: "#f5f0eb",
+            border: "1px solid #e8d9cc",
+            borderRadius: "8px",
+            padding: "12px",
+            marginBottom: "20px",
+            fontSize: "14px"
+          }}>
+            <p style={{ color: "#666", marginBottom: "8px", fontWeight: "500" }}>📌 Demo Credentials:</p>
+            <p style={{ color: "#c17a50", marginBottom: "4px", fontFamily: "monospace" }}>Email: <strong>demo@eyeheat.com</strong></p>
+            <p style={{ color: "#c17a50", fontFamily: "monospace" }}>Password: <strong>demo123</strong></p>
+          </div>
+
+          <button 
+            type="button"
+            onClick={() => window.open('/demo.html', 'EyeHeatDemo', 'width=1000,height=700')}
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginBottom: "20px",
+              background: "transparent",
+              color: "#c17a50",
+              border: "2px solid #c17a50",
+              borderRadius: "8px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Launch Live Demo Dashboard
+          </button>
+
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           {/* FORM */}
@@ -176,25 +208,45 @@ export default function Login() {
                 padding: "12px",
                 marginBottom: 12,
                 borderRadius: 8,
-                border: "1px solid #ccc"
+                border: "1px solid #ccc",
+                fontSize: "16px"
               }}
             />
 
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="login-input"
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginBottom: 12,
-                borderRadius: 8,
-                border: "1px solid #ccc"
-              }}
-            />
+            <div style={{ position: "relative", marginBottom: "12px" }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                className="login-input"
+                required
+                style={{
+                  width: "100%",
+                  padding: "12px 40px 12px 12px",
+                  borderRadius: 8,
+                  border: "1px solid #ccc",
+                  fontSize: "16"
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#888",
+                  padding: "4px"
+                }}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
 
             <button
               type="submit"

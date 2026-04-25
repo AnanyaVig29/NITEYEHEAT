@@ -269,6 +269,28 @@
   transform: scale(1.05);
 }
 
+@media (min-width: 1025px) {
+  .nav-open-btn {
+    display: none;
+  }
+}
+
+.page-title {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #2c2420;
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  color: #6a5c53;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
 @media (max-width: 1024px) {
   .nav-open-btn {
     top: 12px;

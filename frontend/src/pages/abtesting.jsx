@@ -7,8 +7,8 @@ function ABTesting() {
             {/* Header */}
             <div className="abtesting-header">
                 <div>
-                    <h1 className="abtesting-title">A/B Testing (Eye Tracking)</h1>
-                    <p className="abtesting-subtitle">Comparing layout variations using user attention & gaze data, not just clicks.</p>
+                    <h1 className="page-title abtesting-title">A/B Testing (Eye Tracking)</h1>
+                    <p className="page-subtitle abtesting-subtitle">Comparing layout variations using user attention and gaze data, not just clicks.</p>
                 </div>
                 <select className="test-selector">
                     <option>Landing Page CTA Test</option>

@@ -92,8 +92,8 @@ export default function EyeMovementPatterns() {
     <div className="emp-page">
       <div className="emp-header">
         <div>
-          <h1>Eye Movement Patterns</h1>
-          <p style={{ color: "#64748b", fontSize: "15px", marginTop: "8px" }}>Analyze how users visually navigate your interface</p>
+          <h1 className="page-title emp-title">Eye Movement Patterns</h1>
+          <p className="page-subtitle emp-subtitle">Analyze how users visually navigate your interface.</p>
         </div>
         <button className="emp-view-all-btn">View All Patterns</button>
       </div>
@@ -117,7 +117,7 @@ export default function EyeMovementPatterns() {
       </div>
 
       <div className="emp-stats-section">
-        <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b", marginBottom: "32px" }}>Visual Engagement Overview</h2>
+        <h2 className="emp-section-title">Visual Engagement Overview</h2>
         <div className="emp-stats-grid">
           <div className="emp-stat-card">
             <DonutChart percent={72} label="Attention" color="#10b981" />

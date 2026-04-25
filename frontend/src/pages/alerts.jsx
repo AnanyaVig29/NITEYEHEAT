@@ -101,7 +101,8 @@ const alerts = [
 function Alerts() {
     return (
         <div className="alerts-container">
-            <h1 className="alerts-title">Alerts</h1>
+            <h1 className="page-title alerts-title">Alerts</h1>
+            <p className="page-subtitle">Track important insights and issues in one place.</p>
             <div className="alerts-grid">
                 {/* AI Insights & Recommendations */}
                 <div className="alerts-card">
