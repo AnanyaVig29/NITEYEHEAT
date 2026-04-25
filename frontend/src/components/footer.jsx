@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/footer.css";
+import "../styles/Footer.css";
 
 const UsersIcon = () => (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b46445" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

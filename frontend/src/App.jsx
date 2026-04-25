@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import "./styles/navbar.css";
+import "./styles/Navbar.css";
 import "./App.css";
-import "./styles/overview.css";
-import "./styles/analytics.css";
-import "./styles/alerts.css";
-import "./styles/reports.css";
-import "./styles/abtesting.css";
+import "./styles/Overview.css";
+import "./styles/Analytics.css";
+import "./styles/Alerts.css";
+import "./styles/Reports.css";
+import "./styles/ABTesting.css";
 import "./styles/EyeMovementPatterns.css";
 import "./styles/Login.css";
-import "./styles/settings.css";
+import "./styles/Settings.css";
 
 // Import pages
-import Overview from "./pages/overview";
-import Analytics from "./pages/analytics";
-import Reports from "./pages/reports";
-import Alerts from "./pages/alerts";
-import ABTesting from "./pages/abtesting";
+import Overview from "./pages/Overview";
+import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
+import Alerts from "./pages/Alerts";
+import ABTesting from "./pages/ABTesting";
 import EyeMovementPatterns from "./pages/EyeMovementPatterns";
 import Login from "./pages/Login";
-import Settings from "./pages/settings";
+import Settings from "./pages/Settings";
 
 function App() {
   const [isNavOpen, setIsNavOpen] = useState(() => window.innerWidth > 1024);
