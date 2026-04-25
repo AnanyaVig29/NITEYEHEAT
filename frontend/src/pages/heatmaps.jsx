@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { 
   Info, 
   MousePointer, 
@@ -30,15 +30,37 @@ const HEATMAP_TYPES = [
 
 const Heatmaps = () => {
   const [activeType, setActiveType] = useState('gaze');
-  const { data, loading, error } = useLiveAnalytics();
-  
-  const sourcePoints = data?.heatmap?.segmented?.[activeType] || data?.heatmap?.points || [];
+  const [segment, setSegment] = useState('all');
+  const { data, loading, error, refresh } = useLiveAnalytics();
+
+  const resolvedType = useMemo(() => {
+    if (['aoi', 'segment', 'realtime', 'comparative'].includes(activeType)) return 'gaze';
+    return activeType;
+  }, [activeType]);
+
+  const segmentKey = segment === 'desktop' || segment === 'mobile' ? segment : 'all';
+  const sourcePoints =
+    data?.heatmap?.segmentedByDevice?.[segmentKey]?.[resolvedType] ||
+    data?.heatmap?.segmented?.[resolvedType] ||
+    data?.heatmap?.points ||
+    [];
   const points = sourcePoints.slice(-1200);
   const totals = data?.totals || {};
   const currentType = HEATMAP_TYPES.find(t => t.id === activeType) || HEATMAP_TYPES[0];
 
   if (loading && !data) {
     return <div className="loading-state">Initializing Heatmap Engine...</div>;
+  }
+
+  if (error && !data) {
+    return (
+      <div className="loading-state">
+        Failed to load heatmap data: {error}
+        <div style={{ marginTop: 12 }}>
+          <button className="control-item" onClick={refresh}>Retry</button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -64,7 +86,7 @@ const Heatmaps = () => {
 
       <div className="heatmap-main-layout">
         <div className="heatmap-viewer-card">
-          <LiveHeatmapPanel points={points} height="100%" type={activeType} />
+          <LiveHeatmapPanel points={points} height={540} type={resolvedType} />
           
           {activeType === 'aoi' && (
             <div className="aoi-overlay">
@@ -118,9 +140,24 @@ const Heatmaps = () => {
           <div className="info-card" style={{ background: 'rgba(59, 130, 246, 0.05)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
             <h3 style={{ color: '#3b82f6' }}>Segment Filter</h3>
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-              <button className="control-item" style={{ flex: 1, fontSize: '12px' }}>Desktop</button>
-              <button className="control-item" style={{ flex: 1, fontSize: '12px' }}>Mobile</button>
+              <button
+                className="control-item"
+                style={{ flex: 1, fontSize: '12px', opacity: segment === 'desktop' ? 1 : 0.75 }}
+                onClick={() => setSegment((prev) => (prev === 'desktop' ? 'all' : 'desktop'))}
+              >
+                Desktop
+              </button>
+              <button
+                className="control-item"
+                style={{ flex: 1, fontSize: '12px', opacity: segment === 'mobile' ? 1 : 0.75 }}
+                onClick={() => setSegment((prev) => (prev === 'mobile' ? 'all' : 'mobile'))}
+              >
+                Mobile
+              </button>
             </div>
+            <p style={{ marginTop: 10, fontSize: 12, color: '#64748b' }}>
+              Filtering: {segmentKey === 'all' ? 'All devices' : segmentKey}
+            </p>
           </div>
         </aside>
       </div>

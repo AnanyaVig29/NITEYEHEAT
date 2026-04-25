@@ -2,20 +2,12 @@ import { useEffect, useRef, useMemo } from 'react';
 
 function normalizePoints(points, width, height) {
   if (!points.length) return [];
-
-  const xs = points.map((p) => p.x);
-  const ys = points.map((p) => p.y);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-
-  const xRange = Math.max(1, maxX - minX);
-  const yRange = Math.max(1, maxY - minY);
+  const sourceW = Math.max(1, window.innerWidth || width);
+  const sourceH = Math.max(1, window.innerHeight || height);
 
   return points.map((p) => ({
-    x: Math.round(((p.x - minX) / xRange) * Math.max(1, width - 24) + 12),
-    y: Math.round(((p.y - minY) / yRange) * Math.max(1, height - 24) + 12),
+    x: Math.round((Math.min(Math.max(p.x, 0), sourceW - 1) / sourceW) * Math.max(1, width - 1)),
+    y: Math.round((Math.min(Math.max(p.y, 0), sourceH - 1) / sourceH) * Math.max(1, height - 1)),
     ts: p.ts,
   }));
 }
@@ -67,24 +59,26 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const { clientWidth, clientHeight } = containerRef.current;
+    const safeWidth = Math.max(320, clientWidth || 0);
+    const safeHeight = Math.max(240, clientHeight || 0);
 
-    canvas.width = clientWidth;
-    canvas.height = clientHeight;
+    canvas.width = safeWidth;
+    canvas.height = safeHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!points.length) return;
 
-    const dataPoints = normalizePoints(points, clientWidth, clientHeight);
+    const dataPoints = normalizePoints(points, safeWidth, safeHeight);
 
     if (type === 'scroll') {
       // Scroll heatmap: horizontal gradient bands
-      const gradient = ctx.createLinearGradient(0, 0, 0, clientHeight);
+      const gradient = ctx.createLinearGradient(0, 0, 0, safeHeight);
       gradient.addColorStop(0, 'rgba(59, 130, 246, 0.6)');
       gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.3)');
       gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, clientWidth, clientHeight);
+      ctx.fillRect(0, 0, safeWidth, safeHeight);
       return;
     }
 

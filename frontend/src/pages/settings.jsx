@@ -69,7 +69,7 @@ export default function Settings() {
                                 type="range" 
                                 min="0" max="100" 
                                 value={sensitivity} 
-                                onChange={(e) => setSensitivity(e.target.value)} 
+                                onChange={(e) => setSensitivity(Number(e.target.value))} 
                                 className="settings-slider"
                             />
                         </div>

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/reports.css";
 import { useLiveAnalytics } from "../hooks/useLiveAnalytics";
 import { formatDuration, formatNumber } from "../utils/liveFormat";
@@ -15,8 +16,32 @@ import {
 
 function Reports() {
   const { data, loading, error } = useLiveAnalytics();
+  const navigate = useNavigate();
+  const [last24hOnly, setLast24hOnly] = useState(true);
   const recentSessions = data?.recentSessions || [];
   const topPages = data?.topPages || [];
+  const filteredSessions = useMemo(() => {
+    if (!last24hOnly) return recentSessions;
+    const now = Date.now();
+    return recentSessions.filter((session) => now - Number(session.createdAt || 0) <= 24 * 60 * 60 * 1000);
+  }, [last24hOnly, recentSessions]);
+
+  const exportAll = () => {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      sessions: filteredSessions,
+      topPages,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `eyeheat-report-${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="reports-container">
@@ -26,8 +51,10 @@ function Reports() {
           <p className="page-subtitle">Detailed behavior analysis and session logs.</p>
         </div>
         <div className="reports-actions">
-          <button className="control-item"><Filter size={16} /> Filter</button>
-          <button className="control-item primary">
+          <button className="control-item" onClick={() => setLast24hOnly((prev) => !prev)}>
+            <Filter size={16} /> {last24hOnly ? "Last 24h" : "All Time"}
+          </button>
+          <button className="control-item primary" onClick={exportAll}>
             <Download size={16} /> Export All
           </button>
         </div>
@@ -43,8 +70,8 @@ function Reports() {
 
           <div className="reports-list">
             {recentSessions.length ? (
-              recentSessions.map((session) => (
-                <div className="report-item session-row" key={session.id}>
+              filteredSessions.map((session) => (
+                <div className="report-item session-row" key={session.id} onClick={() => navigate("/sessions")}>
                   <div className="session-device-icon">
                     {session.device === 'mobile' ? <Smartphone size={18} /> : <Monitor size={18} />}
                   </div>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/abtesting.css";
 import LiveHeatmapPanel from "../components/LiveHeatmapPanel";
 import { useLiveAnalytics } from "../hooks/useLiveAnalytics";
@@ -13,6 +14,11 @@ import {
   ChevronRight,
   Sparkles
 } from "lucide-react";
+
+function safeLiftPercent(next, base) {
+    if (!Number.isFinite(next) || !Number.isFinite(base) || base <= 0) return 0;
+    return ((next / base) - 1) * 100;
+}
 
 const VariantCard = ({ id, label, points, stats, isWinner, type }) => (
     <div className={`variant-card ${isWinner ? 'winner' : ''}`}>
@@ -44,7 +50,7 @@ const VariantCard = ({ id, label, points, stats, isWinner, type }) => (
             </div>
             <div className="m-item">
                 <span className="m-label">Engagement</span>
-                <span className="m-value">{(stats.avgPoints / 10).toFixed(1)}%</span>
+                <span className="m-value">{(Math.max(0, Number(stats.avgPoints || 0)) / 10).toFixed(1)}%</span>
             </div>
         </div>
     </div>
@@ -52,6 +58,7 @@ const VariantCard = ({ id, label, points, stats, isWinner, type }) => (
 
 export default function ABTesting() {
     const { data, loading, error } = useLiveAnalytics();
+    const navigate = useNavigate();
     const [heatmapType, setHeatmapType] = useState("gaze");
 
     const points = data?.heatmap?.points || [];
@@ -67,6 +74,8 @@ export default function ABTesting() {
     const avgBase = Math.max(1, ((variantA.avgPoints || 0) + (variantB.avgPoints || 0)) / 2);
     const deltaRatio = Math.abs((variantB.avgPoints || 0) - (variantA.avgPoints || 0)) / avgBase;
     const confidence = Math.min(99, Math.max(50, Math.round(50 + Math.min(1, deltaRatio) * 35 + Math.min(15, totalSessions) * 0.8)));
+    const engagementLift = safeLiftPercent(variantB.avgPoints || 0, variantA.avgPoints || 0);
+    const retentionLift = safeLiftPercent(variantB.avgDurationMs || 0, variantA.avgDurationMs || 0);
 
     if (loading) return <div className="loading-state">Calculating variant performance...</div>;
 
@@ -107,12 +116,12 @@ export default function ABTesting() {
                         <h2>{isBWinner ? 'Variant B' : 'Variant A'} is performing better</h2>
                         <p>Based on {formatNumber(totalSessions)} live sessions tracked from the current analytics stream.</p>
                         <div className="summary-tags">
-                            <span className="tag"><Sparkles size={14} /> +{( (variantB.avgPoints / variantA.avgPoints - 1) * 100 ).toFixed(1)}% Engagement</span>
-                            <span className="tag"><Clock size={14} /> +{( (variantB.avgDurationMs / variantA.avgDurationMs - 1) * 100 ).toFixed(1)}% Retention</span>
+                            <span className="tag"><Sparkles size={14} /> {engagementLift >= 0 ? '+' : ''}{engagementLift.toFixed(1)}% Engagement</span>
+                            <span className="tag"><Clock size={14} /> {retentionLift >= 0 ? '+' : ''}{retentionLift.toFixed(1)}% Retention</span>
                         </div>
                     </div>
                 </div>
-                <button className="apply-btn">Deploy Winner <ChevronRight size={18} /></button>
+                <button className="apply-btn" onClick={() => navigate("/reports")}>Deploy Winner <ChevronRight size={18} /></button>
             </div>
 
             <div className="variants-grid">

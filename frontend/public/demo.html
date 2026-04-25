@@ -160,6 +160,55 @@
       gap: 8px;
     }
 
+    .calibration-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 2000;
+      display: none;
+    }
+
+    .calibration-overlay.active {
+      display: block;
+    }
+
+    .calibration-dot {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      background: #f59e0b;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+      }
+      100% {
+        box-shadow: 0 0 0 24px rgba(245, 158, 11, 0);
+      }
+    }
+
+    .calibration-tip {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.96);
+      color: #0f172a;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid #e2e8f0;
+      z-index: 2001;
+    }
+
     .row {
       display: flex;
       justify-content: space-between;
@@ -196,6 +245,7 @@
     </div>
     <div class="controls">
       <button class="btn-primary" id="startBtn">Start Webcam</button>
+      <button class="btn-secondary" id="calibrateBtn">Recalibrate</button>
       <button class="btn-secondary" id="stopBtn">Stop Webcam</button>
       <button class="btn-primary" id="recordBtn" style="background:#dc2626;">Record Screen</button>
       <button class="btn-secondary" id="stopRecordBtn" style="display:none;">Stop Recording</button>
@@ -234,6 +284,8 @@
       <div class="rows" id="topPages"></div>
     </div>
   </div>
+  <div id="calibrationOverlay" class="calibration-overlay"></div>
+  <div id="calibrationTip" class="calibration-tip" style="display:none;"></div>
 
   <script>
     const API_PORT_CANDIDATES = [3001, 3002, 3003, 3004, 3005, 3010];
@@ -241,6 +293,15 @@
     const STATS_INTERVAL_MS = 3000;
     const MAX_BATCH_SIZE = 120;
     const GAZE_SAMPLE_RATE_MS = 120;
+    const CALIBRATION_POINTS = [
+      { x: 10, y: 10 }, { x: 50, y: 10 }, { x: 90, y: 10 },
+      { x: 10, y: 50 }, { x: 50, y: 50 }, { x: 90, y: 50 },
+      { x: 10, y: 90 }, { x: 50, y: 90 }, { x: 90, y: 90 },
+    ];
+    const CALIBRATION_CLICKS_PER_POINT = 5;
+
+    const SMOOTHING_ALPHA = 0.4;
+    const MAX_GAZE_VELOCITY = 3000;
 
     const statusEl = document.getElementById('status');
     const sessionsEl = document.getElementById('sessions');
@@ -248,6 +309,8 @@
     const bounceEl = document.getElementById('bounce');
     const durationEl = document.getElementById('duration');
     const topPagesEl = document.getElementById('topPages');
+    const calibrationOverlayEl = document.getElementById('calibrationOverlay');
+    const calibrationTipEl = document.getElementById('calibrationTip');
 
     const state = {
       active: false,
@@ -267,6 +330,11 @@
       apiBase: '',
       flushInFlight: false,
       statsInFlight: false,
+      smoothedPoint: null,
+      lastRawPoint: null,
+      serverPoints: [],
+      calibrationDoneAt: 0,
+      webgazerReady: false,
     };
 
     function buildApiCandidates() {
@@ -314,39 +382,175 @@
       statusEl.textContent = text;
     }
 
-    function normalizePoints(points, width, height) {
-      if (!points.length) return [];
-      const xs = points.map((p) => p.x);
-      const ys = points.map((p) => p.y);
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-      const xRange = Math.max(1, maxX - minX);
-      const yRange = Math.max(1, maxY - minY);
+    function detectDevice() {
+      const ua = navigator.userAgent || '';
+      const mobileUA = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
+      const smallViewport = window.innerWidth <= 900;
+      return mobileUA || smallViewport ? 'mobile' : 'desktop';
+    }
 
+    function detectUserType() {
+      const key = 'eyeheat_visitor_seen';
+      const seen = localStorage.getItem(key);
+      if (seen) return 'returning';
+      localStorage.setItem(key, '1');
+      return 'new';
+    }
+
+    function clearCalibrationUI() {
+      calibrationOverlayEl.classList.remove('active');
+      calibrationOverlayEl.innerHTML = '';
+      calibrationTipEl.style.display = 'none';
+      calibrationTipEl.textContent = '';
+    }
+
+    async function runCalibrationFlow() {
+      clearCalibrationUI();
+      calibrationOverlayEl.classList.add('active');
+      calibrationTipEl.style.display = 'block';
+
+      return new Promise((resolve) => {
+        let currentIndex = 0;
+        let clicks = 0;
+
+        const renderPoint = () => {
+          if (currentIndex >= CALIBRATION_POINTS.length) {
+            clearCalibrationUI();
+            state.calibrationDoneAt = Date.now();
+            resolve();
+            return;
+          }
+
+          calibrationOverlayEl.innerHTML = '';
+          const point = CALIBRATION_POINTS[currentIndex];
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'calibration-dot';
+          dot.style.left = `${point.x}%`;
+          dot.style.top = `${point.y}%`;
+
+          calibrationTipEl.textContent = `Look at the dot and click (${clicks + 1}/${CALIBRATION_CLICKS_PER_POINT}) - point ${currentIndex + 1}/${CALIBRATION_POINTS.length}`;
+
+          dot.addEventListener('click', () => {
+            const rect = dot.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            if (window.webgazer?.recordScreenPosition) {
+              window.webgazer.recordScreenPosition(x, y, 'click');
+            }
+
+            clicks += 1;
+            if (clicks >= CALIBRATION_CLICKS_PER_POINT) {
+              currentIndex += 1;
+              clicks = 0;
+            }
+            renderPoint();
+          });
+
+          calibrationOverlayEl.appendChild(dot);
+        };
+
+        renderPoint();
+      });
+    }
+
+    async function ensureWebgazerStarted() {
+      if (state.webgazerReady) return;
+      await window.webgazer
+        .setRegression('ridge')
+        .setTracker('TFFacemesh')
+        .setGazeListener((data) => {
+          if (!data || !state.active) return;
+          const now = Date.now();
+          if (now - state.lastGazeAt < GAZE_SAMPLE_RATE_MS) return;
+          state.lastGazeAt = now;
+
+          const point = smoothGazePoint({ x: data.x, y: data.y, ts: now });
+          if (!point) return;
+          state.localPoints.push(point);
+          state.uploadQueue.push(point);
+          state.sessionPoints += 1;
+          if (state.uploadQueue.length >= MAX_BATCH_SIZE) {
+            flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
+          }
+          pointsEl.textContent = `${state.sessionPoints}`;
+          renderHeatmap();
+        })
+        .begin();
+
+      if (typeof window.webgazer.applyKalmanFilter === 'function') {
+        window.webgazer.applyKalmanFilter(true);
+      }
+      window.webgazer.showVideoPreview(true);
+      window.webgazer.showFaceOverlay(false);
+      window.webgazer.showPredictionPoints(false);
+      attachWebcamPreview();
+      state.webgazerReady = true;
+    }
+
+    function mapPointsToBox(points, width, height) {
+      if (!points.length) return [];
+      const sourceW = Math.max(1, window.innerWidth || width);
+      const sourceH = Math.max(1, window.innerHeight || height);
       return points.map((p) => ({
-        x: Math.round(((p.x - minX) / xRange) * Math.max(1, width - 12) + 6),
-        y: Math.round(((p.y - minY) / yRange) * Math.max(1, height - 12) + 6),
+        x: Math.round((Math.min(Math.max(p.x, 0), sourceW - 1) / sourceW) * Math.max(1, width - 1)),
+        y: Math.round((Math.min(Math.max(p.y, 0), sourceH - 1) / sourceH) * Math.max(1, height - 1)),
         value: 1,
       }));
     }
 
+    function smoothGazePoint(rawPoint) {
+      if (!rawPoint) return null;
+      const now = rawPoint.ts || Date.now();
+      const clampedX = Math.min(Math.max(rawPoint.x, 0), Math.max(1, window.innerWidth - 1));
+      const clampedY = Math.min(Math.max(rawPoint.y, 0), Math.max(1, window.innerHeight - 1));
+
+      if (state.lastRawPoint) {
+        const dt = Math.max(1, now - state.lastRawPoint.ts);
+        const dist = Math.hypot(clampedX - state.lastRawPoint.x, clampedY - state.lastRawPoint.y);
+        const speed = (dist / dt) * 1000;
+        if (speed > MAX_GAZE_VELOCITY) {
+          return null;
+        }
+      }
+      state.lastRawPoint = { x: clampedX, y: clampedY, ts: now };
+
+      if (!state.smoothedPoint) {
+        state.smoothedPoint = { x: clampedX, y: clampedY };
+      } else {
+        state.smoothedPoint = {
+          x: state.smoothedPoint.x + (clampedX - state.smoothedPoint.x) * SMOOTHING_ALPHA,
+          y: state.smoothedPoint.y + (clampedY - state.smoothedPoint.y) * SMOOTHING_ALPHA,
+        };
+      }
+
+      return {
+        x: state.smoothedPoint.x,
+        y: state.smoothedPoint.y,
+        ts: now,
+      };
+    }
+
     function renderHeatmap() {
       const now = Date.now();
-      // Keep only points from the last 2 seconds max
-      state.localPoints = state.localPoints.filter(p => now - p.ts <= 2000);
+      // keep the live trail short so the latest gaze highlight is instant and stable
+      state.localPoints = state.localPoints.filter((p) => now - p.ts <= 2500);
+      const sourcePoints = state.active
+        ? state.localPoints
+        : (state.serverPoints || []).slice(-1200);
 
       if (state.heatmap) {
         const container = document.getElementById('heatmap');
-        const dataBox = normalizePoints(state.localPoints, container.clientWidth, container.clientHeight);
+        const dataBox = mapPointsToBox(sourcePoints, container.clientWidth, container.clientHeight);
         state.heatmap.setData({ max: 8, data: dataBox });
       }
 
       if (state.heatmapGlobal) {
-        const dataGlobal = state.localPoints.map(p => ({
-          x: Math.round(p.x),
-          y: Math.round(p.y),
+        const vw = Math.max(1, window.innerWidth);
+        const vh = Math.max(1, window.innerHeight);
+        const dataGlobal = sourcePoints.map((p) => ({
+          x: Math.round(Math.min(Math.max(p.x, 0), vw - 1)),
+          y: Math.round(Math.min(Math.max(p.y, 0), vh - 1)),
           value: 1
         }));
         state.heatmapGlobal.setData({ max: 8, data: dataGlobal });
@@ -355,24 +559,9 @@
 
     function renderServerHeatmap(points) {
       if (!Array.isArray(points)) return;
-      const recent = points.slice(-1200);
-      const heatmapContainer = document.getElementById('heatmap');
-      const dataBox = normalizePoints(recent, heatmapContainer.clientWidth, heatmapContainer.clientHeight);
-
-      if (state.heatmap) {
-        state.heatmap.setData({ max: 8, data: dataBox });
-      }
-
-      if (state.heatmapGlobal) {
-        const vw = Math.max(1, window.innerWidth);
-        const vh = Math.max(1, window.innerHeight);
-        const dataGlobal = recent.map((p) => ({
-          x: Math.round(Math.min(Math.max(p.x, 0), vw - 1)),
-          y: Math.round(Math.min(Math.max(p.y, 0), vh - 1)),
-          value: 1,
-        }));
-        state.heatmapGlobal.setData({ max: 8, data: dataGlobal });
-      }
+      state.serverPoints = points.slice(-1200);
+      // While tracking, do not overwrite live local rendering with backend snapshots.
+      if (!state.active) renderHeatmap();
     }
 
     async function fetchStats() {
@@ -446,43 +635,28 @@
       try {
         state.sessionPoints = 0;
         state.lastGazeAt = 0;
+        state.smoothedPoint = null;
+        state.lastRawPoint = null;
         pointsEl.textContent = '0';
+
+        await ensureWebgazerStarted();
+        setStatus('Calibrating eye tracking...');
+        await runCalibrationFlow();
 
         const startRes = await fetch(apiUrl('/gaze/start'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pageUrl: window.location.href }),
+          body: JSON.stringify({
+            pageUrl: window.location.href,
+            device: detectDevice(),
+            userType: detectUserType(),
+          }),
         });
 
         if (!startRes.ok) throw new Error('Unable to create session');
         const started = await startRes.json();
         state.sessionId = started.sessionId;
-
-        await window.webgazer
-          .setRegression('ridge')
-          .setTracker('TFFacemesh')
-          .setGazeListener((data) => {
-            if (!data || !state.active) return;
-            const now = Date.now();
-            if (now - state.lastGazeAt < GAZE_SAMPLE_RATE_MS) return;
-            state.lastGazeAt = now;
-
-            const point = { x: data.x, y: data.y, ts: now };
-            state.localPoints.push(point);
-            state.uploadQueue.push(point);
-            state.sessionPoints += 1;
-            if (state.uploadQueue.length >= MAX_BATCH_SIZE) {
-              flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
-            }
-            pointsEl.textContent = `${state.sessionPoints}`;
-            renderHeatmap();
-          })
-          .begin();
-
-        window.webgazer.showVideoPreview(true);
-        window.webgazer.showFaceOverlay(false);
-        window.webgazer.showPredictionPoints(false);
-        attachWebcamPreview();
+        state.serverPoints = [];
 
         state.active = true;
         state.batchTimer = setInterval(() => {
@@ -506,6 +680,9 @@
       clearInterval(state.renderTimer);
       state.batchTimer = null;
       state.renderTimer = null;
+      state.smoothedPoint = null;
+      state.lastRawPoint = null;
+      state.serverPoints = [];
 
       await flushBatch();
 
@@ -518,11 +695,11 @@
       }
 
       try {
-        window.webgazer.clearGazeListener();
         window.webgazer.end();
       } catch (_err) {
         // no-op
       }
+      state.webgazerReady = false;
       const preview = document.getElementById('webcamPreview');
       if (preview) preview.style.display = 'none';
 
@@ -539,6 +716,20 @@
 
     document.getElementById('startBtn').addEventListener('click', startTracking);
     document.getElementById('stopBtn').addEventListener('click', stopTracking);
+    document.getElementById('calibrateBtn').addEventListener('click', async () => {
+      try {
+        if (state.active) {
+          setStatus('Stop tracking before recalibration.');
+          return;
+        }
+        await ensureWebgazerStarted();
+        setStatus('Recalibrating...');
+        await runCalibrationFlow();
+        setStatus('Calibration improved. Start tracking now.');
+      } catch (err) {
+        setStatus(`Calibration failed: ${err.message}`);
+      }
+    });
 
     const recordBtn = document.getElementById('recordBtn');
     const stopRecordBtn = document.getElementById('stopRecordBtn');

@@ -36,4 +36,21 @@ if (typeof db.pragma === 'function') {
 
 db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 
+function getTableColumns(tableName) {
+  return db.prepare(`PRAGMA table_info(${tableName})`).all();
+}
+
+function ensureColumn(tableName, columnName, alterSql) {
+  const columns = getTableColumns(tableName);
+  const exists = columns.some((col) => col.name === columnName);
+  if (!exists) {
+    db.exec(alterSql);
+  }
+}
+
+// Keep existing DB files forward-compatible with newer schema.
+ensureColumn('sessions', 'device', "ALTER TABLE sessions ADD COLUMN device TEXT DEFAULT 'desktop'");
+ensureColumn('sessions', 'user_type', "ALTER TABLE sessions ADD COLUMN user_type TEXT DEFAULT 'new'");
+ensureColumn('gaze_points', 'type', "ALTER TABLE gaze_points ADD COLUMN type TEXT DEFAULT 'gaze'");
+
 module.exports = db;

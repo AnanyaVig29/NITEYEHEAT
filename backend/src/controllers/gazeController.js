@@ -57,11 +57,25 @@ function saveBatch(req, res) {
     'INSERT INTO gaze_points (session_id, x, y, ts, type) VALUES (?, ?, ?, ?, ?)'
   );
 
-  const insertMany = db.transaction((batchPoints) => {
-    for (const p of batchPoints) {
-      insert.run(sessionId, p.x, p.y, p.ts, p.type || 'gaze');
-    }
-  });
+  const insertMany =
+    typeof db.transaction === 'function'
+      ? db.transaction((batchPoints) => {
+          for (const p of batchPoints) {
+            insert.run(sessionId, p.x, p.y, p.ts, p.type || 'gaze');
+          }
+        })
+      : (batchPoints) => {
+          db.exec('BEGIN');
+          try {
+            for (const p of batchPoints) {
+              insert.run(sessionId, p.x, p.y, p.ts, p.type || 'gaze');
+            }
+            db.exec('COMMIT');
+          } catch (err) {
+            db.exec('ROLLBACK');
+            throw err;
+          }
+        };
 
   insertMany(points);
 

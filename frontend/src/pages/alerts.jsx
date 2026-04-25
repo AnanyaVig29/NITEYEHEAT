@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/alerts.css";
 import { useLiveAnalytics } from "../hooks/useLiveAnalytics";
 import { formatDuration, formatPercent } from "../utils/liveFormat";
@@ -28,9 +29,13 @@ const SeverityIcon = ({ severity }) => {
 
 export default function Alerts() {
     const { data, loading } = useLiveAnalytics();
+    const navigate = useNavigate();
     const alerts = data?.alerts || [];
     const recommendations = data?.recommendations || [];
     const totals = data?.totals || {};
+    const attentionRetention = Math.max(0, Math.min(100, Number(totals.attentionRetention || 0)));
+    const bounceRate = Math.max(0, Math.min(100, Number(totals.bounceRate || 0)));
+    const focusScore = Math.max(0, Math.min(100, Number(totals.engagementScore || 0)));
 
     if (loading) return <div className="loading-state">Scanning live data for anomalies...</div>;
 
@@ -61,8 +66,8 @@ export default function Alerts() {
                                     </div>
                                     <p>{alert.desc}</p>
                                     <div className="alert-actions">
-                                        <button className="action-btn secondary">View Sessions</button>
-                                        <button className="action-btn primary">Fix Issue</button>
+                                        <button className="action-btn secondary" onClick={() => navigate("/sessions")}>View Sessions</button>
+                                        <button className="action-btn primary" onClick={() => navigate("/reports")}>Fix Issue</button>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +88,7 @@ export default function Alerts() {
                                 </div>
                                 <h4>{rec.title}</h4>
                                 <p>{rec.summary}</p>
-                                <button className="learn-more">Learn more <ArrowRight size={14} /></button>
+                                <button className="learn-more" onClick={() => navigate("/reports")}>Learn more <ArrowRight size={14} /></button>
                             </div>
                         ))}
                     </div>
@@ -98,9 +103,9 @@ export default function Alerts() {
                             <span className="label">Attention Retention</span>
                             <TrendingDown size={16} color="#f43f5e" />
                         </div>
-                        <span className="value">{formatPercent(totals.attentionRetention || 0)}</span>
+                        <span className="value">{formatPercent(attentionRetention)}</span>
                         <div className="health-bar-bg">
-                            <div className="health-bar-fill" style={{ width: `${totals.attentionRetention}%`, background: '#f43f5e' }}></div>
+                            <div className="health-bar-fill" style={{ width: `${attentionRetention}%`, background: '#f43f5e' }}></div>
                         </div>
                     </div>
 
@@ -109,9 +114,9 @@ export default function Alerts() {
                             <span className="label">Focus Score</span>
                             <Zap size={16} color="#3b82f6" />
                         </div>
-                        <span className="value">84/100</span>
+                        <span className="value">{focusScore}/100</span>
                         <div className="health-bar-bg">
-                            <div className="health-bar-fill" style={{ width: '84%', background: '#3b82f6' }}></div>
+                            <div className="health-bar-fill" style={{ width: `${focusScore}%`, background: '#3b82f6' }}></div>
                         </div>
                     </div>
 
@@ -120,9 +125,9 @@ export default function Alerts() {
                             <span className="label">Dead Click Ratio</span>
                             <MousePointerClick size={16} color="#fbbf24" />
                         </div>
-                        <span className="value">{formatPercent(totals.bounceRate / 2 || 0)}</span>
+                        <span className="value">{formatPercent(bounceRate / 2)}</span>
                         <div className="health-bar-bg">
-                            <div className="health-bar-fill" style={{ width: `${totals.bounceRate / 2}%`, background: '#fbbf24' }}></div>
+                            <div className="health-bar-fill" style={{ width: `${bounceRate / 2}%`, background: '#fbbf24' }}></div>
                         </div>
                     </div>
                 </div>

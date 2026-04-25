@@ -17,6 +17,11 @@ import {
 
 function Navbar({ isOpen, toggleNav }) {
     const navigate = useNavigate();
+    const collapseOnMobile = () => {
+        if (window.innerWidth <= 1024 && isOpen) {
+            toggleNav();
+        }
+    };
 
     const handleSignOut = () => {
         // Simple mock sign out
@@ -41,39 +46,39 @@ function Navbar({ isOpen, toggleNav }) {
             <div className="nav-menu">
                 <div className="nav-section">
                     <span className="section-title">Core</span>
-                    <NavLink to="/overview" end className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/overview" end onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Home size={20} /> <span>Overview</span>
                     </NavLink>
-                    <NavLink to="/heatmaps" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/heatmaps" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Flame size={20} /> <span>Heatmaps</span>
                     </NavLink>
-                    <NavLink to="/sessions" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/sessions" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Video size={20} /> <span>Recordings</span>
                     </NavLink>
                 </div>
 
                 <div className="nav-section">
                     <span className="section-title">Behavior</span>
-                    <NavLink to="/eye-movement-patterns" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/eye-movement-patterns" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Eye size={20} /> <span>Eye Tracking</span>
                     </NavLink>
-                    <NavLink to="/analytics" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/analytics" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <BarChart3 size={20} /> <span>Analytics</span>
                     </NavLink>
-                    <NavLink to="/ab-testing" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/ab-testing" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Split size={20} /> <span>A/B Testing</span>
                     </NavLink>
                 </div>
 
                 <div className="nav-section">
                     <span className="section-title">System</span>
-                    <NavLink to="/reports" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/reports" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <FileText size={20} /> <span>Reports</span>
                     </NavLink>
-                    <NavLink to="/alerts" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/alerts" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Bell size={20} /> <span>Alerts</span>
                     </NavLink>
-                    <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+                    <NavLink to="/settings" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
                         <Settings size={20} /> <span>Settings</span>
                     </NavLink>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/overview.css";
 import LiveHeatmapPanel from "../components/LiveHeatmapPanel";
 import { useLiveAnalytics } from "../hooks/useLiveAnalytics";
@@ -18,6 +19,7 @@ import {
 
 function Overview() {
     const { data, loading, error } = useLiveAnalytics();
+    const navigate = useNavigate();
     
     const totals = data?.totals || {};
     const heatmapPoints = (data?.heatmap?.segmented?.gaze || []).slice(-1200);
@@ -166,16 +168,16 @@ function Overview() {
                         <h3>Quick Actions</h3>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }}>
+                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/overview")}>
                             <Activity size={20} /> Real-time
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }}>
+                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/analytics")}>
                             <Users size={20} /> Segments
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }}>
+                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/heatmaps")}>
                             <MousePointer size={20} /> Clicks
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }}>
+                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/reports")}>
                             <TrendingUp size={20} /> Reports
                         </button>
                     </div>

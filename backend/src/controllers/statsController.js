@@ -202,8 +202,10 @@ function getLiveStats(_req, res) {
          y,
          ts,
          session_id AS sessionId,
-         type
-       FROM gaze_points
+         type,
+         COALESCE(s.device, 'desktop') AS device
+       FROM gaze_points gp
+       LEFT JOIN sessions s ON s.id = gp.session_id
        ORDER BY ts DESC
        LIMIT 5000`
     )
@@ -277,6 +279,24 @@ function getLiveStats(_req, res) {
     move: recentPoints.filter(p => p.type === 'move'),
     rage: recentPoints.filter(p => p.type === 'rage'),
     scroll: recentPoints, // Scroll uses all points for depth
+  };
+
+  const segmentedByDevice = {
+    all: segmentedPoints,
+    desktop: {
+      gaze: segmentedPoints.gaze.filter((p) => p.device !== 'mobile'),
+      click: segmentedPoints.click.filter((p) => p.device !== 'mobile'),
+      move: segmentedPoints.move.filter((p) => p.device !== 'mobile'),
+      rage: segmentedPoints.rage.filter((p) => p.device !== 'mobile'),
+      scroll: segmentedPoints.scroll.filter((p) => p.device !== 'mobile'),
+    },
+    mobile: {
+      gaze: segmentedPoints.gaze.filter((p) => p.device === 'mobile'),
+      click: segmentedPoints.click.filter((p) => p.device === 'mobile'),
+      move: segmentedPoints.move.filter((p) => p.device === 'mobile'),
+      rage: segmentedPoints.rage.filter((p) => p.device === 'mobile'),
+      scroll: segmentedPoints.scroll.filter((p) => p.device === 'mobile'),
+    },
   };
 
   const scrollDepth = deriveScrollDepth(recentPoints);
@@ -372,6 +392,7 @@ function getLiveStats(_req, res) {
     heatmap: {
       points: recentPoints,
       segmented: segmentedPoints,
+      segmentedByDevice,
       sessionCount: recentSessions.length,
     },
     topPages,

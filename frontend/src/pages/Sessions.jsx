@@ -132,7 +132,15 @@ const Flame = ({ size, color }) => (
 export default function Sessions() {
     const { data, loading } = useLiveAnalytics();
     const [selectedSession, setSelectedSession] = useState(null);
+    const [showFrustratedOnly, setShowFrustratedOnly] = useState(false);
+    const [useLast24h, setUseLast24h] = useState(true);
     const recentSessions = data?.recentSessions || [];
+    const now = Date.now();
+    const filteredSessions = recentSessions.filter((s) => {
+        const inWindow = !useLast24h || (now - Number(s.createdAt || 0) <= 24 * 60 * 60 * 1000);
+        const frustrated = !showFrustratedOnly || Number(s.pointCount || 0) <= 20;
+        return inWindow && frustrated;
+    });
 
     if (loading) return <div className="loading-state">Loading recordings...</div>;
 
@@ -144,8 +152,12 @@ export default function Sessions() {
                     <p>Replay user journeys and identify friction points.</p>
                 </div>
                 <div className="header-filters">
-                    <button className="control-item"><Calendar size={16} /> Last 24h</button>
-                    <button className="control-item"><AlertCircle size={16} /> Frustrated Only</button>
+                    <button className="control-item" onClick={() => setUseLast24h((prev) => !prev)}>
+                        <Calendar size={16} /> {useLast24h ? "Last 24h" : "All Time"}
+                    </button>
+                    <button className="control-item" onClick={() => setShowFrustratedOnly((prev) => !prev)}>
+                        <AlertCircle size={16} /> {showFrustratedOnly ? "All Sessions" : "Frustrated Only"}
+                    </button>
                 </div>
             </header>
 
@@ -159,7 +171,7 @@ export default function Sessions() {
                     <span></span>
                 </div>
                 <div className="sessions-list">
-                    {recentSessions.map((s) => (
+                    {filteredSessions.map((s) => (
                         <div className="session-row" key={s.id} onClick={() => setSelectedSession(s)}>
                             <div className="user-cell">
                                 <div className="user-avatar">
@@ -187,10 +199,23 @@ export default function Sessions() {
                                 {new Date(s.createdAt).toLocaleTimeString()}
                             </div>
                             <div className="action-cell">
-                                <button className="play-btn"><Play size={16} fill="currentColor" /></button>
+                                <button
+                                    className="play-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedSession(s);
+                                    }}
+                                >
+                                    <Play size={16} fill="currentColor" />
+                                </button>
                             </div>
                         </div>
                     ))}
+                    {!filteredSessions.length && (
+                        <div className="session-row">
+                            <div style={{ gridColumn: "1 / -1", color: "#64748b" }}>No sessions match these filters.</div>
+                        </div>
+                    )}
                 </div>
             </div>
 
