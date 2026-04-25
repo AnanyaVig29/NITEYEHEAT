@@ -1,0 +1,1 @@
+and the dot should start when we click on the recalibrate anot on the start webcam and we click on web cam it should start the gazing  and in the eye tracking pattern should make the shape in the heatmap for the review and check also the heatmap it should fetch and process everything 
