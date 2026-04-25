@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getLiveStats } from '../utils/gazeApi';
 
-export function useLiveAnalytics(pollMs = 8000) {
+export function useLiveAnalytics(pollMs = 3000) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

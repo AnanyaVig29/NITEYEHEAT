@@ -187,7 +187,9 @@ function getLiveStats(_req, res) {
          page_url AS pageUrl,
          created_at AS createdAt,
          ended_at AS endedAt,
-         point_count AS pointCount
+         point_count AS pointCount,
+         device,
+         user_type AS userType
        FROM sessions
        ORDER BY created_at DESC`
     )
@@ -199,7 +201,8 @@ function getLiveStats(_req, res) {
          x,
          y,
          ts,
-         session_id AS sessionId
+         session_id AS sessionId,
+         type
        FROM gaze_points
        ORDER BY ts DESC
        LIMIT 5000`
@@ -264,7 +267,17 @@ function getLiveStats(_req, res) {
     endedAt: s.endedAt,
     pointCount: s.pointCount,
     durationMs: s.endedAt ? Math.max(0, s.endedAt - s.createdAt) : 0,
+    device: s.device,
+    userType: s.userType,
   }));
+
+  const segmentedPoints = {
+    gaze: recentPoints.filter(p => p.type === 'gaze' || !p.type),
+    click: recentPoints.filter(p => p.type === 'click'),
+    move: recentPoints.filter(p => p.type === 'move'),
+    rage: recentPoints.filter(p => p.type === 'rage'),
+    scroll: recentPoints, // Scroll uses all points for depth
+  };
 
   const scrollDepth = deriveScrollDepth(recentPoints);
   const sectionEngagement = deriveSectionEngagement(recentPoints);
@@ -358,6 +371,7 @@ function getLiveStats(_req, res) {
     },
     heatmap: {
       points: recentPoints,
+      segmented: segmentedPoints,
       sessionCount: recentSessions.length,
     },
     topPages,
@@ -369,6 +383,14 @@ function getLiveStats(_req, res) {
     recommendations,
     ab,
     recentSessions,
+    deviceStats: {
+      desktop: sessions.filter(s => s.device === 'desktop').length,
+      mobile: sessions.filter(s => s.device === 'mobile').length,
+    },
+    userTypeStats: {
+      new: sessions.filter(s => s.userType === 'new').length,
+      returning: sessions.filter(s => s.userType === 'returning').length,
+    }
   });
 }
 

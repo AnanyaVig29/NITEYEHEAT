@@ -1,356 +1,296 @@
-/* ===== REPORTS CONTAINER ===== */
-.reports-container {
-  padding: 32px 36px;
-  background: #fdfbf7;
-  min-height: 100vh;
+/* ===== REPORTS HEADER ===== */
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
 }
 
-.reports-title {
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #2c2420;
-  margin-bottom: 6px;
+.reports-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.reports-container .page-subtitle {
+.error-text {
+  color: var(--status-negative);
+  background: rgba(239, 68, 68, 0.05);
+  padding: 12px 20px;
+  border-radius: 12px;
   margin-bottom: 24px;
+  font-size: 14px;
 }
 
 /* ===== REPORTS GRID ===== */
 .reports-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(12, 1fr);
   gap: 24px;
+  margin-bottom: 40px;
+}
+
+.sessions-list-card {
+  grid-column: span 7;
+}
+
+.behavior-flow-card {
+  grid-column: span 5;
 }
 
 /* ===== CARD BASE ===== */
 .reports-card {
-  background: #fff;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  padding: 24px;
+  background: var(--bg-secondary);
+  border-radius: 32px;
+  border: 1px solid var(--glass-border);
+  padding: 32px;
+  box-shadow: 0 10px 30px var(--glass-shadow);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 26px rgba(44, 36, 32, 0.04);
 }
 
 .reports-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .reports-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Outfit', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-}
-
-.reports-view-all {
-  font-size: 13px;
-  color: #b46445;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.reports-view-all:hover {
-  color: #9a5338;
+  color: var(--text-primary);
 }
 
 /* ===== REPORTS LIST ===== */
 .reports-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1;
+  gap: 12px;
 }
 
-.report-item {
+.report-item.session-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: #fdfbf7;
-  border: 1px solid #f0ebe3;
-  transition: all 0.2s ease;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(180, 100, 69, 0.02);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
-.report-item:hover {
-  background: #f6efe6;
-  border-color: #e2dcd0;
-  transform: translateX(4px);
+.report-item.session-row:hover {
+  background: #fff;
+  border-color: var(--accent-primary);
+  transform: translateX(8px);
+  box-shadow: 0 4px 15px var(--glass-shadow);
 }
 
-.report-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+.session-device-icon {
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  background: rgba(180, 100, 69, 0.05);
+  color: var(--accent-primary);
+  border-radius: 12px;
 }
 
 .report-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex: 1;
+  gap: 4px;
 }
 
 .report-title {
   font-size: 14px;
-  font-weight: 600;
-  color: #1e293b;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.report-date {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.report-pdf-btn {
+.report-meta {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #64748b;
+  gap: 8px;
   font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+  color: var(--text-secondary);
 }
 
-.report-pdf-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #334155;
-}
-
-@media (max-width: 1024px) {
-  .reports-container {
-    padding: 24px 28px;
-  }
-
-  .reports-title {
-    font-size: 30px;
-  }
-
-  .flow-card {
-    padding: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .reports-container {
-    padding: 18px 20px;
-  }
-
-  .reports-card,
-  .flow-card {
-    padding: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  .reports-container {
-    padding: 14px 16px;
-  }
-
-  .reports-title {
-    font-size: 24px;
-  }
-}
-
-/* ===== CREATE REPORT BUTTON ===== */
-.create-report-btn {
-  margin-top: 16px;
-  padding: 14px;
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #c4835a, #b46445);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(180, 100, 69, 0.3);
-}
-
-.create-report-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(180, 100, 69, 0.4);
-}
-
-/* ===== USER BEHAVIOR FLOW ===== */
-.flow-card {
-  padding: 32px;
-}
-
-.flow-subtitle {
-  font-size: 14px;
-  color: #94a3b8;
-  margin: 4px 0 36px 0;
-}
-
-.flow-diagram {
+.session-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 0;
+  align-items: flex-end;
+  gap: 2px;
+  margin-right: 12px;
 }
 
-/* Main flow row */
-.flow-main-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.flow-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 18px 32px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  min-width: 130px;
-  max-width: 100%;
-  transition: all 0.2s ease;
-}
-
-.flow-node:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.flow-path {
+.session-stats .pts {
   font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-primary);
+}
+
+.session-stats .dur {
+  font-size: 11px;
+  color: var(--text-secondary);
   font-weight: 600;
-  color: #1e293b;
-  font-style: italic;
 }
 
-.flow-users {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-.flow-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-}
-
-/* Connectors */
-.flow-connectors {
-  display: flex;
-  justify-content: center;
-  gap: 200px;
-  position: relative;
-  height: 56px;
-}
-
-.connector-line {
+/* ===== BEHAVIOR FLOW ===== */
+.flow-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0;
+  gap: 20px;
 }
 
-/* Branch row */
-.flow-branch-row {
+.flow-step {
   display: flex;
-  gap: 120px;
-  justify-content: center;
+  gap: 20px;
 }
 
-.branch-node {
-  background: #fdfbf7;
-  border-color: #e2dcd0;
+.step-number {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-primary);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(180, 100, 69, 0.2);
+}
+
+.step-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-path {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.step-sessions {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.step-bar-container {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.step-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 4px;
+}
+
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ===== ACTIVITY OVERVIEW ===== */
+.activity-overview-section {
+  margin-top: 40px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.activity-kpi-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px var(--glass-shadow);
+  transition: transform 0.2s;
+}
+
+.activity-kpi-card:hover {
+  transform: translateY(-5px);
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--status-positive);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  width: fit-content;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
-  .flow-branch-row {
-    gap: 40px;
-  }
-  .flow-connectors {
-    gap: 120px;
-  }
+  .sessions-list-card { grid-column: span 12; }
+  .behavior-flow-card { grid-column: span 12; }
 }
 
-@media (max-width: 1024px) {
-  .reports-container {
-    padding: 16px;
-  }
-  .flow-card {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 900px) {
-  .flow-main-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .flow-arrow {
-    transform: rotate(90deg);
-    margin: 8px 0;
-  }
-  .flow-connectors, .flow-branch-row {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .report-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .report-pdf-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .flow-node {
-    width: 100%;
-    min-width: 0;
-  }
+@media (max-width: 768px) {
+  .reports-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .reports-actions { width: 100%; }
+  .reports-actions button { flex: 1; }
+  .reports-title { font-size: 28px; }
 }
 
 @media (max-width: 480px) {
-  .reports-title {
-    font-size: 22px;
-  }
-  
-  .reports-card {
-    padding: 16px;
-  }
-
-  .reports-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
+  .activity-kpi-card { padding: 20px; }
+  .report-item.session-row { padding: 12px; gap: 12px; }
+  .session-device-icon { width: 36px; height: 36px; min-width: 36px; }
+  .pts { font-size: 13px !important; }
 }

@@ -1,121 +1,89 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fdfbf7;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* CORE PALETTE */
+  --bg-primary: #fdfbf7;
+  --bg-secondary: #ffffff;
+  --text-primary: #2c2420;
+  --text-secondary: #8c7f76;
+  --accent-primary: #b46445; /* Earthbound Terracotta */
+  
+  /* HEATMAP & VISUALIZATION PALETTE */
+  --heat-hot: rgba(220, 38, 38, 0.4);
+  --heat-warm: rgba(245, 158, 11, 0.2);
+  --heat-cool: rgba(22, 163, 74, 0.1);
+  --heat-cold: rgba(37, 99, 235, 0.02);
 
-  --sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* ANALYTICS & STATUS COLORS */
+  --status-positive: #10b981;
+  --status-negative: #ef4444;
+  --status-neutral: #64748b;
+  --badge-live: #00ffff;
+
+  /* PREMIUM GLASSMORPHISM */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(180, 100, 69, 0.1);
+  --glass-shadow: rgba(44, 36, 32, 0.05);
+
+  --sans: 'Outfit', 'Inter', system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 16px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+    --bg-primary: #0f0d0c;
+    --bg-secondary: #1a1817;
+    --text-primary: #fdfbf7;
+    --text-secondary: #a3968f;
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --glass-bg: rgba(26, 24, 23, 0.8);
+    --glass-border: rgba(180, 100, 69, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.3);
   }
 }
 
-#root {
-  width: 100%;
-  margin: 0;
-  text-align: center;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+* {
   box-sizing: border-box;
-}
-
-@media (max-width: 1126px) {
-  #root {
-    border-inline: none;
-  }
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 42px;
-    margin: 24px 0;
-  }
-  @media (max-width: 640px) {
-    font-size: 32px;
-    margin: 16px 0;
-    padding: 0 16px;
-  }
+.main-content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  position: relative;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 22px;
-  }
-  @media (max-width: 640px) {
-    font-size: 18px;
-    padding: 0 16px;
-  }
-}
-p {
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+p {
+  color: var(--text-secondary);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }

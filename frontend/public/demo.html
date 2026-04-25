@@ -237,9 +237,10 @@
 
   <script>
     const API_PORT_CANDIDATES = [3001, 3002, 3003, 3004, 3005, 3010];
-    const FLUSH_INTERVAL_MS = 250;
-    const STATS_INTERVAL_MS = 350;
-    const MAX_BATCH_SIZE = 8;
+    const FLUSH_INTERVAL_MS = 3000;
+    const STATS_INTERVAL_MS = 3000;
+    const MAX_BATCH_SIZE = 120;
+    const GAZE_SAMPLE_RATE_MS = 120;
 
     const statusEl = document.getElementById('status');
     const sessionsEl = document.getElementById('sessions');
@@ -261,6 +262,8 @@
       mediaRecorder: null,
       recordedChunks: [],
       lastStatsAt: 0,
+      lastGazeAt: 0,
+      sessionPoints: 0,
       apiBase: '',
       flushInFlight: false,
       statsInFlight: false,
@@ -383,7 +386,9 @@
         state.lastStatsAt = Date.now();
 
         sessionsEl.textContent = `${totals.sessions || 0}`;
-        pointsEl.textContent = `${totals.points || 0}`;
+        pointsEl.textContent = state.active
+          ? `${state.sessionPoints}`
+          : `${totals.points || 0}`;
         bounceEl.textContent = `${Number(totals.bounceRate || 0).toFixed(1)}%`;
         durationEl.textContent = formatDuration(totals.avgDurationMs || 0);
         renderServerHeatmap(data.heatmap?.points || []);
@@ -439,6 +444,10 @@
       if (state.active) return;
 
       try {
+        state.sessionPoints = 0;
+        state.lastGazeAt = 0;
+        pointsEl.textContent = '0';
+
         const startRes = await fetch(apiUrl('/gaze/start'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -454,13 +463,18 @@
           .setTracker('TFFacemesh')
           .setGazeListener((data) => {
             if (!data || !state.active) return;
-            const point = { x: data.x, y: data.y, ts: Date.now() };
+            const now = Date.now();
+            if (now - state.lastGazeAt < GAZE_SAMPLE_RATE_MS) return;
+            state.lastGazeAt = now;
+
+            const point = { x: data.x, y: data.y, ts: now };
             state.localPoints.push(point);
             state.uploadQueue.push(point);
+            state.sessionPoints += 1;
             if (state.uploadQueue.length >= MAX_BATCH_SIZE) {
               flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
             }
-            pointsEl.textContent = (parseInt(pointsEl.textContent) || 0) + 1;
+            pointsEl.textContent = `${state.sessionPoints}`;
             renderHeatmap();
           })
           .begin();
@@ -474,9 +488,6 @@
         state.batchTimer = setInterval(() => {
           flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
         }, FLUSH_INTERVAL_MS);
-        state.statsTimer = setInterval(() => {
-          fetchStats().catch((err) => setStatus(`Live stats error: ${err.message}`));
-        }, STATS_INTERVAL_MS);
         state.renderTimer = setInterval(renderHeatmap, 120);
 
         setStatus(`Tracking live. Session: ${state.sessionId.slice(0, 8)}...`);
@@ -494,7 +505,6 @@
       clearInterval(state.statsTimer);
       clearInterval(state.renderTimer);
       state.batchTimer = null;
-      state.statsTimer = null;
       state.renderTimer = null;
 
       await flushBatch();

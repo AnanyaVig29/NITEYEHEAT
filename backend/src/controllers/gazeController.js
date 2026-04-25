@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const db = require('../db/database');
 
 function startSession(req, res) {
-  const { pageUrl } = req.body || {};
+  const { pageUrl, device = 'desktop', userType = 'new' } = req.body || {};
 
   if (!pageUrl || typeof pageUrl !== 'string') {
     return res.status(400).json({ error: 'pageUrl is required' });
@@ -10,8 +10,8 @@ function startSession(req, res) {
 
   const sessionId = uuidv4();
   db.prepare(
-    'INSERT INTO sessions (id, page_url, created_at) VALUES (?, ?, ?)'
-  ).run(sessionId, pageUrl, Date.now());
+    'INSERT INTO sessions (id, page_url, created_at, device, user_type) VALUES (?, ?, ?, ?, ?)'
+  ).run(sessionId, pageUrl, Date.now(), device, userType);
 
   return res.json({ sessionId });
 }
@@ -54,12 +54,12 @@ function saveBatch(req, res) {
   }
 
   const insert = db.prepare(
-    'INSERT INTO gaze_points (session_id, x, y, ts) VALUES (?, ?, ?, ?)'
+    'INSERT INTO gaze_points (session_id, x, y, ts, type) VALUES (?, ?, ?, ?, ?)'
   );
 
   const insertMany = db.transaction((batchPoints) => {
     for (const p of batchPoints) {
-      insert.run(sessionId, p.x, p.y, p.ts);
+      insert.run(sessionId, p.x, p.y, p.ts, p.type || 'gaze');
     }
   });
 

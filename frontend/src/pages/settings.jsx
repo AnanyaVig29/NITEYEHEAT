@@ -1,148 +1,130 @@
 import React, { useState } from "react";
 import "../styles/settings.css";
+import { 
+  User, 
+  Eye, 
+  Bell, 
+  Shield, 
+  Moon, 
+  Sun, 
+  Smartphone, 
+  Monitor,
+  Camera,
+  Save,
+  Trash2
+} from "lucide-react";
 
-const SettingsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
+export default function Settings() {
+    const [sensitivity, setSensitivity] = useState(75);
+    const [darkMode, setDarkMode] = useState(true);
 
-const BellIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-  </svg>
-);
+    return (
+        <div className="settings-container">
+            <header className="page-header">
+                <div className="title-group">
+                    <h1>Settings</h1>
+                    <p>Configure your tracking engine and dashboard preferences.</p>
+                </div>
+                <button className="save-btn"><Save size={18} /> Save Changes</button>
+            </header>
 
-const LockIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-  </svg>
-);
+            <div className="settings-bento">
+                {/* PROFILE SECTION */}
+                <div className="settings-card profile">
+                    <div className="card-header">
+                        <h3><User size={18} /> Account Profile</h3>
+                    </div>
+                    <div className="profile-content">
+                        <div className="avatar-wrapper">
+                            <div className="avatar">AV</div>
+                            <button className="edit-avatar"><Camera size={14} /></button>
+                        </div>
+                        <div className="profile-fields">
+                            <div className="field">
+                                <label>Full Name</label>
+                                <input type="text" defaultValue="Ananya Vig" />
+                            </div>
+                            <div className="field">
+                                <label>Email Address</label>
+                                <input type="email" defaultValue="ananya@example.com" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-function Settings() {
-  const [settings, setSettings] = useState({
-    notifications: true,
-    emailAlerts: true,
-    theme: "light",
-    autoSave: true,
-  });
+                {/* TRACKING SENSITIVITY */}
+                <div className="settings-card tracking">
+                    <div className="card-header">
+                        <h3><Eye size={18} /> Tracking Sensitivity</h3>
+                    </div>
+                    <div className="tracking-content">
+                        <p className="description">Adjust how aggressively fixation points are clustered into heatmaps.</p>
+                        <div className="slider-group">
+                            <div className="slider-labels">
+                                <span>Smooth</span>
+                                <span>{sensitivity}%</span>
+                                <span>Granular</span>
+                            </div>
+                            <input 
+                                type="range" 
+                                min="0" max="100" 
+                                value={sensitivity} 
+                                onChange={(e) => setSensitivity(e.target.value)} 
+                                className="settings-slider"
+                            />
+                        </div>
+                        <div className="tracking-options">
+                            <div className="t-option">
+                                <span>Ignore Rage Clicks</span>
+                                <label className="switch">
+                                    <input type="checkbox" />
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
+                            <div className="t-option">
+                                <span>Mobile Smoothing</span>
+                                <label className="switch">
+                                    <input type="checkbox" defaultChecked />
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  const handleToggle = (key) => {
-    setSettings({ ...settings, [key]: !settings[key] });
-  };
+                {/* APPEARANCE */}
+                <div className="settings-card appearance">
+                    <div className="card-header">
+                        <h3>{darkMode ? <Moon size={18} /> : <Sun size={18} />} Appearance</h3>
+                    </div>
+                    <div className="theme-toggle">
+                        <button 
+                            className={`theme-btn ${!darkMode ? 'active' : ''}`}
+                            onClick={() => setDarkMode(false)}
+                        >
+                            <Sun size={16} /> Light
+                        </button>
+                        <button 
+                            className={`theme-btn ${darkMode ? 'active' : ''}`}
+                            onClick={() => setDarkMode(true)}
+                        >
+                            <Moon size={16} /> Dark
+                        </button>
+                    </div>
+                </div>
 
-  const handleChange = (key, value) => {
-    setSettings({ ...settings, [key]: value });
-  };
-
-  return (
-    <div className="settings-container">
-      <div className="settings-header">
-        <h1 className="settings-title">Settings</h1>
-        <p className="settings-subtitle">Manage your preferences and account settings</p>
-      </div>
-
-      <div className="settings-grid">
-        {/* General Settings */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <SettingsIcon />
-            <h2 className="settings-card-title">General Settings</h2>
-          </div>
-          <div className="settings-option">
-            <div className="option-label">
-              <span className="option-title">Theme</span>
-              <span className="option-description">Choose your preferred appearance</span>
+                {/* SECURITY */}
+                <div className="settings-card security">
+                    <div className="card-header">
+                        <h3><Shield size={18} /> Security</h3>
+                    </div>
+                    <div className="security-options">
+                        <button className="sec-btn">Reset Password</button>
+                        <button className="sec-btn">Two-Factor Auth</button>
+                        <button className="sec-btn danger"><Trash2 size={16} /> Delete Account</button>
+                    </div>
+                </div>
             </div>
-            <select
-              value={settings.theme}
-              onChange={(e) => handleChange("theme", e.target.value)}
-              className="settings-select"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="auto">Auto</option>
-            </select>
-          </div>
-          <div className="settings-option">
-            <div className="option-label">
-              <span className="option-title">Auto Save</span>
-              <span className="option-description">Automatically save changes</span>
-            </div>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={settings.autoSave}
-                onChange={() => handleToggle("autoSave")}
-              />
-              <span className="toggle-slider"></span>
-            </label>
-          </div>
         </div>
-
-        {/* Notifications */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <BellIcon />
-            <h2 className="settings-card-title">Notifications</h2>
-          </div>
-          <div className="settings-option">
-            <div className="option-label">
-              <span className="option-title">Push Notifications</span>
-              <span className="option-description">Receive browser notifications</span>
-            </div>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={settings.notifications}
-                onChange={() => handleToggle("notifications")}
-              />
-              <span className="toggle-slider"></span>
-            </label>
-          </div>
-          <div className="settings-option">
-            <div className="option-label">
-              <span className="option-title">Email Alerts</span>
-              <span className="option-description">Receive alerts via email</span>
-            </div>
-            <label className="toggle-switch">
-              <input
-                type="checkbox"
-                checked={settings.emailAlerts}
-                onChange={() => handleToggle("emailAlerts")}
-              />
-              <span className="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        {/* Security */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <LockIcon />
-            <h2 className="settings-card-title">Security</h2>
-          </div>
-          <div className="settings-option">
-            <button className="btn-primary">Change Password</button>
-          </div>
-          <div className="settings-option">
-            <button className="btn-secondary">Enable Two-Factor Authentication</button>
-          </div>
-          <div className="settings-option">
-            <button className="btn-danger">Sign Out All Sessions</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="settings-footer">
-        <button className="btn-save">Save Changes</button>
-        <button className="btn-cancel">Cancel</button>
-      </div>
-    </div>
-  );
+    );
 }
-
-export default Settings;

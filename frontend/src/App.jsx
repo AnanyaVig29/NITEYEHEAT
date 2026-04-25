@@ -22,8 +22,12 @@ import Alerts from "./pages/alerts";
 import ABTesting from "./pages/abtesting";
 import EyeMovementPatterns from "./pages/EyeMovementPatterns";
 import Heatmaps from "./pages/heatmaps";
+import Sessions from "./pages/Sessions";
 //import Login from "./pages/Login";
 import Settings from "./pages/settings";
+import BehaviorTracker from "./components/BehaviorTracker";
+
+import "./styles/sessions.css";
 
 function App() {
   const [isNavOpen, setIsNavOpen] = useState(() => window.innerWidth > 1024);
@@ -62,6 +66,7 @@ function App() {
         </button>
       )}
 
+      <BehaviorTracker />
       <Navbar isOpen={isNavOpen} toggleNav={toggleNav} />
 
       <main className="main-content">
@@ -75,7 +80,7 @@ function App() {
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/heatmaps" element={<Heatmaps />} />
-          <Route path="/sessions" element={<Reports />} />
+          <Route path="/sessions" element={<Sessions />} />
           <Route path="/ab-testing" element={<ABTesting />} />
           <Route path="/eye-movement-patterns" element={<EyeMovementPatterns />} />
           <Route path="/settings" element={<Settings />} />
