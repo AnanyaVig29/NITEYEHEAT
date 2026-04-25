@@ -1,6 +1,6 @@
 const API_ROOT = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 const ENV_API_BASE = API_ROOT.endsWith('/api') ? API_ROOT : `${API_ROOT}/api`;
-const API_PORT_CANDIDATES = [3001, 3002, 3003, 3004, 3005];
+const API_PORT_CANDIDATES = [3001, 3002, 3003, 3004, 3005, 3010];
 let resolvedApiBase = '';
 let resolvingApiPromise = null;
 

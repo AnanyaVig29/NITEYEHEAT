@@ -16,10 +16,11 @@ export default function HeatmapCanvas({ getPoints, active }) {
       minOpacity: 0.05,
       blur: 0.85,
       gradient: {
-        0.2: '#2563eb',
-        0.4: '#16a34a',
-        0.7: '#f59e0b',
-        1.0: '#dc2626',
+        0.2: '#007AFF', // Cold (Blue)
+        0.4: '#34C759', // Cool (Green)
+        0.6: '#FFD60A', // Medium (Yellow)
+        0.8: '#FF9500', // Warm (Orange)
+        1.0: '#FF3B30', // Hot (Red)
       },
     });
 

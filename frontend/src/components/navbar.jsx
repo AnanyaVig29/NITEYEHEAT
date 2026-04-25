@@ -34,7 +34,7 @@ function Navbar({ isOpen, toggleNav }) {
             <div className="navbar-header">
                 <div className="logo-group">
                     <div className="logo-icon">
-                        <Eye size={24} color="#3b82f6" />
+                        <Eye size={24} color="var(--accent-primary)" />
                     </div>
                     <span className="logo-text">EyeHeat</span>
                 </div>

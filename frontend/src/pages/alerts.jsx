@@ -122,12 +122,12 @@ export default function Alerts() {
 
                     <div className="health-card">
                         <div className="health-header">
-                            <span className="label">Dead Click Ratio</span>
+                            <span className="label">Interaction Density</span>
                             <MousePointerClick size={16} color="#fbbf24" />
                         </div>
-                        <span className="value">{formatPercent(bounceRate / 2)}</span>
+                        <span className="value">{formatPercent(100 - bounceRate / 2)}</span>
                         <div className="health-bar-bg">
-                            <div className="health-bar-fill" style={{ width: `${bounceRate / 2}%`, background: '#fbbf24' }}></div>
+                            <div className="health-bar-fill" style={{ width: `${100 - bounceRate / 2}%`, background: '#fbbf24' }}></div>
                         </div>
                     </div>
                 </div>

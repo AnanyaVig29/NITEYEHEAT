@@ -1,19 +1,20 @@
 .navbar {
-    width: 260px;
+    width: 240px;
     height: 100vh;
     background: var(--bg-secondary);
-    border-right: 1px solid var(--glass-border);
+    border-right: 1px solid var(--border-muted);
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: fixed;
+    left: 0;
     top: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
-    box-shadow: 10px 0 30px var(--glass-shadow);
+    box-shadow: 1px 0 10px var(--glass-shadow);
 }
 
 .navbar.closed {
-    width: 80px;
+    width: 72px;
 }
 
 .navbar-header {
@@ -41,7 +42,7 @@
     justify-content: center;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(180, 100, 69, 0.2);
+    box-shadow: 0 4px 12px var(--glass-shadow);
 }
 
 .logo-text {
@@ -68,7 +69,7 @@
 
 .nav-toggle-btn:hover {
     color: var(--accent-primary);
-    background: #fff;
+    background: var(--bg-secondary);
     transform: scale(1.1);
 }
 
@@ -117,7 +118,7 @@
 }
 
 .nav-item:hover {
-    background: rgba(180, 100, 69, 0.04);
+    background: rgba(229, 140, 107, 0.08);
     color: var(--accent-primary);
     transform: translateX(4px);
 }
@@ -125,7 +126,7 @@
 .nav-item.active {
     background: var(--accent-primary);
     color: #fff;
-    box-shadow: 0 8px 20px rgba(180, 100, 69, 0.25);
+    box-shadow: 0 8px 20px rgba(229, 140, 107, 0.25);
 }
 
 .nav-item.active:hover {
@@ -146,9 +147,9 @@
 .live-indicator {
     width: 8px;
     height: 8px;
-    background: var(--badge-live);
+    background: var(--chart-teal);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--badge-live);
+    box-shadow: 0 0 10px var(--chart-teal);
     margin-left: auto;
 }
 
@@ -179,12 +180,43 @@
 /* RESPONSIVE MOBILE OVERLAY */
 @media (max-width: 1024px) {
     .navbar {
+        width: min(84vw, 320px);
         position: fixed;
-        left: -260px;
+        left: calc(-1 * min(88vw, 340px));
         box-shadow: 15px 0 40px rgba(0,0,0,0.1);
     }
     
     .navbar.open {
         left: 0;
+    }
+
+    .navbar-header {
+        padding: 18px 16px;
+    }
+
+    .nav-menu {
+        padding: 16px 10px;
+        gap: 16px;
+    }
+
+    .nav-item {
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 520px) {
+    .logo-text {
+        font-size: 17px;
+    }
+
+    .nav-toggle-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .navbar-footer {
+        padding: 12px 10px;
     }
 }

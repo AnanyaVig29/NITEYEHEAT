@@ -93,8 +93,8 @@ function Overview() {
             <div className="kpi-grid">
                 {kpiCards.map((card, i) => (
                     <div className="kpi-card" key={i}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                            <div className="kpi-icon" style={{ color: card.positive ? '#3b82f6' : '#f43f5e' }}>
+                        <div className="kpi-top">
+                            <div className={`kpi-icon ${card.positive ? 'positive' : 'negative'}`}>
                                 {card.icon}
                             </div>
                             <span className={`kpi-change ${card.positive ? 'positive' : 'negative'}`}>
@@ -117,7 +117,7 @@ function Overview() {
                             {patterns.layerCake > 50 && <span className="pattern-tag">Layer Cake</span>}
                         </div>
                     </div>
-                    <div style={{ flex: 1, position: 'relative' }}>
+                    <div className="heatmap-wrap">
                         <LiveHeatmapPanel points={heatmapPoints} height="100%" type="gaze" />
                     </div>
                 </div>
@@ -145,20 +145,20 @@ function Overview() {
                     <div className="bento-header">
                         <h3>User Behavior Flow</h3>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '100%', color: '#94a3b8' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 24, fontWeight: 700, color: '#f8fafc' }}>{formatPercent(totals.attentionRetention || 0)}</div>
-                            <div style={{ fontSize: 12 }}>Attention Retention</div>
+                    <div className="flow-metrics">
+                        <div className="flow-metric">
+                            <div className="flow-value">{formatPercent(totals.attentionRetention || 0)}</div>
+                            <div className="flow-label">Attention Retention</div>
                         </div>
-                        <div style={{ width: 1, height: 40, background: 'rgba(255,255,255,0.1)' }}></div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 24, fontWeight: 700, color: '#f8fafc' }}>{formatNumber(totals.avgPointsPerSession || 0)}</div>
-                            <div style={{ fontSize: 12 }}>Points / Session</div>
+                        <div className="flow-divider"></div>
+                        <div className="flow-metric">
+                            <div className="flow-value">{formatNumber(totals.avgPointsPerSession || 0)}</div>
+                            <div className="flow-label">Points / Session</div>
                         </div>
-                        <div style={{ width: 1, height: 40, background: 'rgba(255,255,255,0.1)' }}></div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 24, fontWeight: 700, color: '#f8fafc' }}>{formatNumber(totals.ttffMs || 0)}ms</div>
-                            <div style={{ fontSize: 12 }}>Time to First Fixation</div>
+                        <div className="flow-divider"></div>
+                        <div className="flow-metric">
+                            <div className="flow-value">{formatNumber(totals.ttffMs || 0)}ms</div>
+                            <div className="flow-label">Time to First Fixation</div>
                         </div>
                     </div>
                 </div>
@@ -167,17 +167,17 @@ function Overview() {
                     <div className="bento-header">
                         <h3>Quick Actions</h3>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/overview")}>
+                    <div className="quick-actions-grid">
+                        <button className="quick-action-btn" onClick={() => navigate("/overview")}>
                             <Activity size={20} /> Real-time
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/analytics")}>
+                        <button className="quick-action-btn" onClick={() => navigate("/analytics")}>
                             <Users size={20} /> Segments
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/heatmaps")}>
+                        <button className="quick-action-btn" onClick={() => navigate("/heatmaps")}>
                             <MousePointer size={20} /> Clicks
                         </button>
-                        <button className="control-item" style={{ height: 80, flexDirection: 'column', gap: 8 }} onClick={() => navigate("/reports")}>
+                        <button className="quick-action-btn" onClick={() => navigate("/reports")}>
                             <TrendingUp size={20} /> Reports
                         </button>
                     </div>

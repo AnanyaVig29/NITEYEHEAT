@@ -1,9 +1,18 @@
-/* ===== REPORTS HEADER ===== */
+.reports-container {
+    padding: var(--page-pad-y) var(--page-pad-x);
+    background: var(--bg-primary);
+    min-height: 100vh;
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+    width: 100%;
+}
+
 .reports-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+  gap: 20px;
 }
 
 .reports-actions {
@@ -39,10 +48,10 @@
 /* ===== CARD BASE ===== */
 .reports-card {
   background: var(--bg-secondary);
-  border-radius: 32px;
-  border: 1px solid var(--glass-border);
-  padding: 32px;
-  box-shadow: 0 10px 30px var(--glass-shadow);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border-muted);
+  padding: var(--card-pad);
+  box-shadow: 0 8px 24px var(--glass-shadow);
   display: flex;
   flex-direction: column;
 }
@@ -74,9 +83,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 20px;
-  background: rgba(180, 100, 69, 0.02);
-  border: 1px solid transparent;
+  padding: clamp(12px, 1.8vw, 18px);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-muted);
   border-radius: 16px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -95,7 +104,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(180, 100, 69, 0.05);
+  background: rgba(229, 140, 107, 0.05);
   color: var(--accent-primary);
   border-radius: 12px;
 }
@@ -105,12 +114,16 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+    min-width: 0;
 }
 
 .report-title {
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .report-meta {
@@ -127,6 +140,11 @@
   align-items: flex-end;
   gap: 2px;
   margin-right: 12px;
+}
+
+.arrow {
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .session-stats .pts {
@@ -236,8 +254,8 @@
 .activity-kpi-card {
   background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
-  border-radius: 28px;
-  padding: 24px 32px;
+  border-radius: var(--card-radius);
+  padding: clamp(16px, 2vw, 24px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 10px 30px var(--glass-shadow);
@@ -285,7 +303,22 @@
   .reports-header { flex-direction: column; align-items: flex-start; gap: 20px; }
   .reports-actions { width: 100%; }
   .reports-actions button { flex: 1; }
-  .reports-title { font-size: 28px; }
+  .reports-title { font-size: clamp(1.4rem, 5vw, 1.75rem); }
+  .report-item.session-row {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .report-meta {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .session-stats {
+    margin-right: 0;
+    align-items: flex-start;
+  }
+  .arrow {
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 480px) {

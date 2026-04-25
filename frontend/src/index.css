@@ -1,64 +1,75 @@
 :root {
-  /* CORE PALETTE */
-  --bg-primary: #fdfbf7;
-  --bg-secondary: #ffffff;
-  --text-primary: #2c2420;
-  --text-secondary: #8c7f76;
-  --accent-primary: #b46445; /* Earthbound Terracotta */
+  /* PRIMARY UI PALETTE (Core Design Colors) */
+  --bg-primary: #F5EFE9;
+  --bg-secondary: #FAF7F3;
+  --border-muted: #E5DED6;
+  --text-primary: #2F2F2F;
+  --text-secondary: #7A7A7A;
   
-  /* HEATMAP & VISUALIZATION PALETTE */
-  --heat-hot: rgba(220, 38, 38, 0.4);
-  --heat-warm: rgba(245, 158, 11, 0.2);
-  --heat-cool: rgba(22, 163, 74, 0.1);
-  --heat-cold: rgba(37, 99, 235, 0.02);
+  /* ACCENT & BRAND COLORS */
+  --accent-primary: #E58C6B;
+  --accent-dark: #D97757;
+  --accent-hover: #C86547;
 
-  /* ANALYTICS & STATUS COLORS */
-  --status-positive: #10b981;
-  --status-negative: #ef4444;
-  --status-neutral: #64748b;
-  --badge-live: #00ffff;
+  /* ANALYTICS / DATA VISUALIZATION COLORS */
+  --chart-blue: #5A8DEE;
+  --chart-light-blue: #9DBCFD;
+  --chart-teal: #4FD1C5;
 
-  /* PREMIUM GLASSMORPHISM */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(180, 100, 69, 0.1);
-  --glass-shadow: rgba(44, 36, 32, 0.05);
+  /* SUCCESS / POSITIVE INDICATORS */
+  --status-positive: #4CAF50;
+  --status-positive-light: #A5D6A7;
+
+  /* WARNING / NEGATIVE INDICATORS */
+  --status-negative: #E57373;
+  --status-negative-light: #FFCDD2;
+
+  /* HEATMAP COLORS (High to Low Attention) */
+  --heat-hot: #FF3B30;
+  --heat-warm: #FF9500;
+  --heat-medium: #FFD60A;
+  --heat-cool: #34C759;
+  --heat-cold: #007AFF;
+
+  /* NEUTRALS & SHADOWS */
+  --glass-shadow: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: var(--border-muted);
 
   --sans: 'Outfit', 'Inter', system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
+  --page-max-width: 1320px;
+  --page-pad-x: clamp(14px, 2.4vw, 32px);
+  --page-pad-y: clamp(16px, 2.2vw, 28px);
+  --card-radius: clamp(14px, 1.8vw, 24px);
+  --card-pad: clamp(14px, 1.9vw, 24px);
 
   font: 16px/145% var(--sans);
   background: var(--bg-primary);
   color: var(--text-primary);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #0f0d0c;
-    --bg-secondary: #1a1817;
-    --text-primary: #fdfbf7;
-    --text-secondary: #a3968f;
-
-    --glass-bg: rgba(26, 24, 23, 0.8);
-    --glass-border: rgba(180, 100, 69, 0.2);
-    --glass-shadow: rgba(0, 0, 0, 0.3);
-  }
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
   overflow-x: hidden;
   background: var(--bg-primary);
   color: var(--text-primary);
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
   display: flex;
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -76,6 +87,99 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
   color: var(--text-secondary);
+}
+
+img,
+canvas,
+svg,
+video {
+  max-width: 100%;
+}
+
+.overview-container,
+.analytics-container,
+.heatmaps-container,
+.sessions-page,
+.reports-container,
+.alerts-container,
+.settings-container,
+.eye-tracking-container,
+.ab-testing-container {
+  width: min(100%, var(--page-max-width));
+  margin-inline: auto;
+  padding: var(--page-pad-y) var(--page-pad-x);
+}
+
+.kpi-card,
+.analytics-card,
+.reports-card,
+.alert-card,
+.health-card,
+.settings-card,
+.pattern-card,
+.variant-card,
+.info-card {
+  border-radius: var(--card-radius);
+  padding: var(--card-pad);
+}
+
+.control-item,
+.action-btn,
+.sec-btn,
+.theme-btn,
+.selector-btn {
+  min-height: 40px;
+  line-height: 1.25;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: clamp(16px, 2.4vw, 32px);
+  flex-wrap: wrap;
+}
+
+.title-group h1 {
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.title-group p,
+.page-subtitle {
+  font-size: clamp(0.88rem, 1.4vw, 1rem);
+  max-width: 68ch;
+}
+
+.header-filters,
+.reports-actions,
+.overview-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-max-width: 100%;
+  }
+
+  h1 {
+    font-size: clamp(1.45rem, 6vw, 1.9rem);
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: clamp(1.2rem, 5vw, 1.45rem);
+  }
 }
 
 .loading-state {

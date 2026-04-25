@@ -88,7 +88,7 @@ export function useWebGazer({ onGaze, enabled, onError }) {
       if (typeof webgazer.applyKalmanFilter === 'function') {
         webgazer.applyKalmanFilter(true);
       }
-      webgazer.showPredictionPoints(false);
+      webgazer.showPredictionPoints(true);
       webgazer.showVideoPreview(true);
       webgazer.showFaceOverlay(false);
       startedRef.current = true;

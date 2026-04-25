@@ -8,9 +8,23 @@ export default function BehaviorTracker() {
     const sessionIdRef = useRef(null);
     const queueRef = useRef([]);
     const lastMoveRef = useRef(0);
-    const clickHistoryRef = useRef([]); // For rage click detection
 
     useEffect(() => {
+        // DO NOT track behavior on the analytics dashboard itself to avoid polluting data
+        const isDashboardPath = [
+            '/overview', 
+            '/analytics', 
+            '/reports', 
+            '/alerts', 
+            '/heatmaps', 
+            '/sessions', 
+            '/settings', 
+            '/ab-testing', 
+            '/eye-movement-patterns'
+        ].some(path => window.location.pathname.includes(path));
+
+        if (isDashboardPath) return;
+
         const initSession = async () => {
             try {
                 const { sessionId } = await startSession(window.location.href);
@@ -46,22 +60,6 @@ export default function BehaviorTracker() {
             };
             
             queueRef.current.push(point);
-
-            // Rage click detection: 3 clicks within 500ms in a 50px radius
-            clickHistoryRef.current.push(point);
-            const recentClicks = clickHistoryRef.current.filter(c => now - c.ts < 500);
-            if (recentClicks.length >= 3) {
-                const first = recentClicks[0];
-                const isRage = recentClicks.every(c => 
-                    Math.abs(c.x - first.x) < 50 && Math.abs(c.y - first.y) < 50
-                );
-                if (isRage) {
-                    queueRef.current.push({ ...point, type: 'rage' });
-                    console.warn('Rage click detected!');
-                }
-            }
-            // Keep history lean
-            if (clickHistoryRef.current.length > 10) clickHistoryRef.current.shift();
         };
 
         window.addEventListener('mousemove', handleMouseMove);

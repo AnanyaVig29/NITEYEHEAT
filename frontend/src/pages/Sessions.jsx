@@ -213,7 +213,7 @@ export default function Sessions() {
                     ))}
                     {!filteredSessions.length && (
                         <div className="session-row">
-                            <div style={{ gridColumn: "1 / -1", color: "#64748b" }}>No sessions match these filters.</div>
+                            <div className="empty-row">No sessions match these filters.</div>
                         </div>
                     )}
                 </div>

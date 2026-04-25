@@ -131,7 +131,7 @@ function Reports() {
                 { label: 'Avg Session Depth', value: '4.2 pages', sub: 'Top 10% users' },
                 { label: 'Time to Interactive', value: '1.8s', sub: '95th percentile' },
                 { label: 'Conversion Rate', value: '3.4%', sub: 'Last 24 hours' },
-                { label: 'Rage Click Freq', value: '0.2 / ses', sub: 'Low priority' },
+                { label: 'Attention Score', value: '84/100', sub: 'High intensity' },
             ].map((stat, i) => (
                 <div className="activity-kpi-card" key={i}>
                     <span className="kpi-label">{stat.label}</span>

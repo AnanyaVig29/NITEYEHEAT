@@ -16,7 +16,13 @@ import {
 
 export default function Settings() {
     const [sensitivity, setSensitivity] = useState(75);
-    const [darkMode, setDarkMode] = useState(true);
+    const [mobileSmoothing, setMobileSmoothing] = useState(true);
+    const [message, setMessage] = useState("");
+
+    const showMessage = (text) => {
+        setMessage(text);
+        window.setTimeout(() => setMessage(""), 2000);
+    };
 
     return (
         <div className="settings-container">
@@ -25,8 +31,16 @@ export default function Settings() {
                     <h1>Settings</h1>
                     <p>Configure your tracking engine and dashboard preferences.</p>
                 </div>
-                <button className="save-btn"><Save size={18} /> Save Changes</button>
+                <button
+                    className="save-btn"
+                    onClick={() =>
+                        showMessage(`Saved: Sensitivity ${sensitivity}% | Mobile Smoothing: ${mobileSmoothing ? 'On' : 'Off'}`)
+                    }
+                >
+                    <Save size={18} /> Save Changes
+                </button>
             </header>
+            {message ? <p className="settings-msg">{message}</p> : null}
 
             <div className="settings-bento">
                 {/* PROFILE SECTION */}
@@ -75,16 +89,9 @@ export default function Settings() {
                         </div>
                         <div className="tracking-options">
                             <div className="t-option">
-                                <span>Ignore Rage Clicks</span>
-                                <label className="switch">
-                                    <input type="checkbox" />
-                                    <span className="slider round"></span>
-                                </label>
-                            </div>
-                            <div className="t-option">
                                 <span>Mobile Smoothing</span>
                                 <label className="switch">
-                                    <input type="checkbox" defaultChecked />
+                                    <input type="checkbox" checked={mobileSmoothing} onChange={() => setMobileSmoothing((v) => !v)} />
                                     <span className="slider round"></span>
                                 </label>
                             </div>
@@ -119,9 +126,9 @@ export default function Settings() {
                         <h3><Shield size={18} /> Security</h3>
                     </div>
                     <div className="security-options">
-                        <button className="sec-btn">Reset Password</button>
-                        <button className="sec-btn">Two-Factor Auth</button>
-                        <button className="sec-btn danger"><Trash2 size={16} /> Delete Account</button>
+                        <button className="sec-btn" onClick={() => showMessage("Password reset link sent.")}>Reset Password</button>
+                        <button className="sec-btn" onClick={() => showMessage("Two-factor authentication setup started.")}>Two-Factor Auth</button>
+                        <button className="sec-btn danger" onClick={() => showMessage("Delete account action requires confirmation flow.")}><Trash2 size={16} /> Delete Account</button>
                     </div>
                 </div>
             </div>

@@ -29,18 +29,15 @@ const createPalette = (colors) => {
 
 const PALETTE_DEFINITIONS = {
   gaze: [
-    { pos: 0.1, color: 'rgba(37, 99, 235, 0.2)' },
-    { pos: 0.4, color: 'rgba(22, 163, 74, 0.4)' },
-    { pos: 0.7, color: 'rgba(245, 158, 11, 0.7)' },
-    { pos: 1.0, color: 'rgba(220, 38, 38, 0.9)' }
+    { pos: 0.2, color: '#007AFF' }, // Cold (Blue)
+    { pos: 0.4, color: '#34C759' }, // Cool (Green)
+    { pos: 0.6, color: '#FFD60A' }, // Medium (Yellow)
+    { pos: 0.8, color: '#FF9500' }, // Warm (Orange)
+    { pos: 1.0, color: '#FF3B30' }  // Hot (Red)
   ],
   click: [
-    { pos: 0.2, color: 'rgba(180, 100, 69, 0.2)' },
-    { pos: 1.0, color: 'rgba(180, 100, 69, 0.9)' }
-  ],
-  rage: [
-    { pos: 0.1, color: '#ef4444' },
-    { pos: 1.0, color: '#000000' }
+    { pos: 0.2, color: '#5A8DEE' }, // Blue
+    { pos: 1.0, color: '#9DBCFD' }  // Light Blue
   ]
 };
 
@@ -103,8 +100,8 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
     }
 
     // 1. Draw points using shadow blur to create the alpha map
-    const radius = type === 'click' || type === 'rage' ? 15 : 35;
-    const alphaBase = type === 'rage' ? 0.2 : 0.08;
+    const radius = type === 'click' ? 20 : 45;
+    const alphaBase = 0.08;
     
     dataPoints.forEach((p) => {
       ctx.beginPath();
@@ -143,10 +140,9 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
         height,
         borderRadius: 16,
         border: '1px solid rgba(255, 255, 255, 0.1)',
-        background: 'rgba(15, 23, 42, 0.6)',
-        backdropFilter: 'blur(12px)',
+        background: 'var(--bg-primary)',
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 4px 12px var(--glass-shadow)',
       }}
     >
       <canvas
@@ -165,6 +161,7 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
       ) : null}
       
       <div className="heatmap-type-indicator">
+        <span className="live-pulse"></span>
         {type.toUpperCase()} MODE
       </div>
 
@@ -183,6 +180,9 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
           position: absolute;
           top: 12px;
           right: 12px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
           padding: 4px 10px;
           background: rgba(0, 0, 0, 0.4);
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -191,6 +191,20 @@ export default function LiveHeatmapPanel({ points = [], height = 400, type = 'ga
           font-size: 10px;
           font-weight: 700;
           letter-spacing: 1px;
+        }
+        .live-pulse {
+          width: 6px;
+          height: 6px;
+          background: #10b981;
+          border-radius: 50%;
+          display: inline-block;
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
       `}} />
     </div>

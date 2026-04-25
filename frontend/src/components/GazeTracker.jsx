@@ -116,6 +116,16 @@ export default function GazeTracker() {
     }
   }, [renderBuffer]);
 
+  const handleRecalibrate = useCallback(() => {
+    setCalibrated(false);
+    setShowCalibration(true);
+  }, []);
+
+  const handleStartWebcam = useCallback(async () => {
+    setTrackingActive(true);
+    setStatus('webcam_active');
+  }, []);
+
   const handleCalibrationComplete = useCallback(async () => {
     try {
       const started = await startSession(window.location.href);
@@ -177,6 +187,8 @@ export default function GazeTracker() {
         onStart={startTrackingSession}
         onStop={stopTracking}
         onRefreshSessions={refreshSessions}
+        onRecalibrate={handleRecalibrate}
+        onStartWebcam={handleStartWebcam}
       />
 
       {error ? <p className="tracker-error">{error}</p> : null}

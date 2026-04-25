@@ -66,8 +66,8 @@ function App() {
         </button>
       )}
 
-      <BehaviorTracker />
       <Navbar isOpen={isNavOpen} toggleNav={toggleNav} />
+      <BehaviorTracker />
 
       <main className="main-content">
         <Routes>

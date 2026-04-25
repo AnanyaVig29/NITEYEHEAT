@@ -7,13 +7,14 @@
   <title>EyeHeat Live Demo</title>
   <style>
     :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --ink: #142132;
-      --muted: #64748b;
-      --accent: #b46445;
-      --accent-dark: #8a4b33;
-      --border: #e2e8f0;
+      --bg: #F5EFE9;
+      --card: #FAF7F3;
+      --ink: #2F2F2F;
+      --muted: #7A7A7A;
+      --accent: #E58C6B;
+      --accent-dark: #D97757;
+      --border: #E5DED6;
+      --shadow: rgba(0, 0, 0, 0.05);
     }
 
     * {
@@ -76,9 +77,11 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      padding: 16px;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
       position: relative;
       z-index: 1;
     }
@@ -107,8 +110,9 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 4px 12px var(--shadow);
     }
 
     .status {
@@ -119,14 +123,11 @@
 
     .heatmap {
       position: relative;
-      height: 420px;
-      border-radius: 12px;
-      border: 1px dashed #cbd5e1;
+      height: 500px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
       overflow: hidden;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.08), transparent 42%),
-        radial-gradient(circle at 75% 70%, rgba(239, 68, 68, 0.08), transparent 40%),
-        #f8fafc;
+      background: #fff;
     }
 
     .kpis {
@@ -136,8 +137,9 @@
 
     .kpi {
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--bg);
     }
 
     .kpi .label {
@@ -255,33 +257,61 @@
 
   <div class="layout">
     <div class="card">
-      <h3>Live Heatmap</h3>
-      <p class="status">This heatmap is generated from live gaze points pushed to backend every 3 seconds.</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Live Attention Heatmap</h3>
+        <div id="liveIndicator" style="display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #dc2626;">
+          <span style="width: 8px; height: 8px; background: #dc2626; border-radius: 50%; display: inline-block; animation: pulse 1s infinite;"></span>
+          LIVE TRACKING
+        </div>
+      </div>
+      <p class="status">Real-time behavior visualization. Data is pushed to the secure analytics engine every 3 seconds.</p>
       <div id="heatmap" class="heatmap"></div>
+      
+      <div style="margin-top: 24px;">
+        <h4 style="margin-bottom: 12px;">Recent Insights & Alerts</h4>
+        <div id="alertsList" class="rows">
+          <div class="row">Waiting for insight engine...</div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
-      <h3>Live KPIs</h3>
+      <h3 style="margin-bottom: 20px;">System Health & KPIs</h3>
       <div class="kpis">
         <div class="kpi">
-          <div class="label">Sessions</div>
+          <div class="label">Live Points (Current Session)</div>
+          <div class="value" id="points">0</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Total Sessions</div>
           <div class="value" id="sessions">0</div>
         </div>
         <div class="kpi">
-          <div class="label">Gaze Points</div>
-          <div class="value" id="points">0</div>
+          <div class="label">Engagement Score</div>
+          <div class="value" id="engagement">0%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Avg Session Time</div>
+          <div class="value" id="duration">0s</div>
         </div>
         <div class="kpi">
           <div class="label">Bounce Rate</div>
           <div class="value" id="bounce">0.0%</div>
         </div>
         <div class="kpi">
-          <div class="label">Avg Session Time</div>
-          <div class="value" id="duration">0s</div>
+          <div class="label">Returning Visitors</div>
+          <div class="value" id="returning">0%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Time to Fixation (TTFF)</div>
+          <div class="value" id="ttff">0ms</div>
         </div>
       </div>
 
-      <div class="rows" id="topPages"></div>
+      <div style="margin-top: 32px;">
+        <h4 style="margin-bottom: 12px;">Top Performance Pages</h4>
+        <div class="rows" id="topPages"></div>
+      </div>
     </div>
   </div>
   <div id="calibrationOverlay" class="calibration-overlay"></div>
@@ -292,23 +322,27 @@
     const FLUSH_INTERVAL_MS = 3000;
     const STATS_INTERVAL_MS = 3000;
     const MAX_BATCH_SIZE = 120;
-    const GAZE_SAMPLE_RATE_MS = 120;
     const CALIBRATION_POINTS = [
       { x: 10, y: 10 }, { x: 50, y: 10 }, { x: 90, y: 10 },
       { x: 10, y: 50 }, { x: 50, y: 50 }, { x: 90, y: 50 },
       { x: 10, y: 90 }, { x: 50, y: 90 }, { x: 90, y: 90 },
     ];
     const CALIBRATION_CLICKS_PER_POINT = 5;
-
-    const SMOOTHING_ALPHA = 0.4;
-    const MAX_GAZE_VELOCITY = 3000;
+    const GAZE_SAMPLE_RATE_MS = 60; // Faster sampling for better precision
+    const SMOOTHING_ALPHA = 0.25; // More smoothing to reduce jitter
+    const MAX_GAZE_VELOCITY = 2000; // Filter out extreme jumps
 
     const statusEl = document.getElementById('status');
     const sessionsEl = document.getElementById('sessions');
-    const pointsEl = document.getElementById('points');
+    const engagementEl = document.getElementById('engagement');
     const bounceEl = document.getElementById('bounce');
     const durationEl = document.getElementById('duration');
+    const returningEl = document.getElementById('returning');
+    const ttffEl = document.getElementById('ttff');
+    const pointsEl = document.getElementById('points');
     const topPagesEl = document.getElementById('topPages');
+    const alertsListEl = document.getElementById('alertsList');
+    const liveIndicatorEl = document.getElementById('liveIndicator');
     const calibrationOverlayEl = document.getElementById('calibrationOverlay');
     const calibrationTipEl = document.getElementById('calibrationTip');
 
@@ -473,13 +507,19 @@
           if (state.uploadQueue.length >= MAX_BATCH_SIZE) {
             flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
           }
-          pointsEl.textContent = `${state.sessionPoints}`;
+          if (pointsEl) {
+            pointsEl.textContent = `${state.sessionPoints}`;
+          }
           renderHeatmap();
         })
         .begin();
 
       if (typeof window.webgazer.applyKalmanFilter === 'function') {
         window.webgazer.applyKalmanFilter(true);
+      }
+      // Fine-tune Kalman filter if available
+      if (window.webgazer.params) {
+        window.webgazer.params.stdev = 5; // Reduce standard deviation for tighter tracking
       }
       window.webgazer.showVideoPreview(true);
       window.webgazer.showFaceOverlay(false);
@@ -565,29 +605,46 @@
     }
 
     async function fetchStats() {
-      if (state.statsInFlight) return;
+      if (state.statsInFlight || !state.apiBase) return;
       state.statsInFlight = true;
-      const res = await fetch(apiUrl('/stats/live'), { cache: 'no-store' });
       try {
+        const res = await fetch(apiUrl('/stats/live'), { cache: 'no-store' });
         if (!res.ok) throw new Error(`Stats request failed (${res.status})`);
         const data = await res.json();
         const totals = data.totals || {};
         state.lastStatsAt = Date.now();
 
         sessionsEl.textContent = `${totals.sessions || 0}`;
-        pointsEl.textContent = state.active
-          ? `${state.sessionPoints}`
-          : `${totals.points || 0}`;
+        engagementEl.textContent = `${totals.engagementScore || 0}%`;
         bounceEl.textContent = `${Number(totals.bounceRate || 0).toFixed(1)}%`;
         durationEl.textContent = formatDuration(totals.avgDurationMs || 0);
+        returningEl.textContent = `${totals.returnVisitors || 0}%`;
+        ttffEl.textContent = `${totals.ttffMs || 0}ms`;
+
         renderServerHeatmap(data.heatmap?.points || []);
 
         topPagesEl.innerHTML = '';
         (data.topPages || []).slice(0, 4).forEach((page) => {
           const row = document.createElement('div');
           row.className = 'row';
-          row.innerHTML = `<span>${page.page}</span><strong>${page.sessions} sessions</strong>`;
+          row.style.marginBottom = '6px';
+          row.innerHTML = `<span>${page.page}</span><strong style="color:var(--accent);">${page.sessions} sessions</strong>`;
           topPagesEl.appendChild(row);
+        });
+
+        alertsListEl.innerHTML = '';
+        (data.alerts || []).forEach((alert) => {
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.style.marginBottom = '6px';
+          const severityColor = alert.severity === 'high' ? '#dc2626' : '#d97706';
+          row.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-weight:700; color:${severityColor}">${alert.title}</span>
+              <span style="font-size:11px; color:var(--muted)">${alert.desc}</span>
+            </div>
+          `;
+          alertsListEl.appendChild(row);
         });
       } finally {
         state.statsInFlight = false;
@@ -637,11 +694,11 @@
         state.lastGazeAt = 0;
         state.smoothedPoint = null;
         state.lastRawPoint = null;
-        pointsEl.textContent = '0';
+        if (pointsEl) {
+          pointsEl.textContent = '0';
+        }
 
         await ensureWebgazerStarted();
-        setStatus('Calibrating eye tracking...');
-        await runCalibrationFlow();
 
         const startRes = await fetch(apiUrl('/gaze/start'), {
           method: 'POST',
@@ -659,6 +716,7 @@
         state.serverPoints = [];
 
         state.active = true;
+        liveIndicatorEl.style.display = 'flex';
         state.batchTimer = setInterval(() => {
           flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
         }, FLUSH_INTERVAL_MS);
@@ -700,6 +758,7 @@
         // no-op
       }
       state.webgazerReady = false;
+      liveIndicatorEl.style.display = 'none';
       const preview = document.getElementById('webcamPreview');
       if (preview) preview.style.display = 'none';
 
@@ -791,29 +850,31 @@
 
     state.heatmap = window.h337.create({
       container: document.getElementById('heatmap'),
-      radius: 28,
-      maxOpacity: 0.72,
+      radius: 35, // Larger radius for more natural heatmap
+      maxOpacity: 0.8,
       minOpacity: 0.05,
-      blur: 0.86,
+      blur: 0.9,
       gradient: {
-        0.2: '#3b82f6',
-        0.45: '#22c55e',
-        0.7: '#f59e0b',
-        1.0: '#ef4444',
+        0.2: '#007AFF',
+        0.4: '#34C759',
+        0.6: '#FFD60A',
+        0.8: '#FF9500',
+        1.0: '#FF3B30',
       },
     });
 
     state.heatmapGlobal = window.h337.create({
       container: document.getElementById('fullpage-heatmap'),
-      radius: 50,
-      maxOpacity: 0.7,
+      radius: 60, // Even larger for global view
+      maxOpacity: 0.6,
       minOpacity: 0.02,
-      blur: 0.90,
+      blur: 0.95,
       gradient: {
-        0.2: '#3b82f6',
-        0.45: '#22c55e',
-        0.7: '#f59e0b',
-        1.0: '#ef4444',
+        0.2: '#007AFF',
+        0.4: '#34C759',
+        0.6: '#FFD60A',
+        0.8: '#FF9500',
+        1.0: '#FF3B30',
       },
     });
 

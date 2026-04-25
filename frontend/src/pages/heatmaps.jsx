@@ -22,29 +22,18 @@ const HEATMAP_TYPES = [
   { id: 'scroll', label: 'Scroll', icon: <ScrollText size={18} />, desc: 'Shows how far users scroll down the page.' },
   { id: 'move', label: 'Move', icon: <Move size={18} />, desc: 'Tracks mouse movement as a proxy for eye movement.' },
   { id: 'aoi', label: 'AOI', icon: <Layout size={18} />, desc: 'Focuses on specific sections like buttons or images.' },
-  { id: 'segment', label: 'Segment', icon: <Users size={18} />, desc: 'Compare mobile vs desktop or new vs returning users.' },
-  { id: 'realtime', label: 'Real-Time', icon: <Zap size={18} />, desc: 'Shows live user activity as it happens.' },
-  { id: 'comparative', label: 'Comparative', icon: <Copy size={18} />, desc: 'A/B testing view to compare two designs.' },
-  { id: 'rage', label: 'Rage Click', icon: <AlertCircle size={18} />, desc: 'Highlights repeated rapid clicks in one area.' },
 ];
 
 const Heatmaps = () => {
   const [activeType, setActiveType] = useState('gaze');
-  const [segment, setSegment] = useState('all');
   const { data, loading, error, refresh } = useLiveAnalytics();
 
   const resolvedType = useMemo(() => {
-    if (['aoi', 'segment', 'realtime', 'comparative'].includes(activeType)) return 'gaze';
+    if (['aoi'].includes(activeType)) return 'gaze';
     return activeType;
   }, [activeType]);
 
-  const segmentKey = segment === 'desktop' || segment === 'mobile' ? segment : 'all';
-  const sourcePoints =
-    data?.heatmap?.segmentedByDevice?.[segmentKey]?.[resolvedType] ||
-    data?.heatmap?.segmented?.[resolvedType] ||
-    data?.heatmap?.points ||
-    [];
-  const points = sourcePoints.slice(-1200);
+  const points = (data?.heatmap?.segmented?.[resolvedType] || data?.heatmap?.points || []).slice(-1200);
   const totals = data?.totals || {};
   const currentType = HEATMAP_TYPES.find(t => t.id === activeType) || HEATMAP_TYPES[0];
 
@@ -107,58 +96,41 @@ const Heatmaps = () => {
 
         <aside className="heatmap-sidebar">
           <div className="info-card">
-            <h3><Info size={18} style={{ verticalAlign: "middle", marginRight: "8px" }} /> {currentType.label} Insights</h3>
-            <p style={{ marginBottom: '1.5rem' }}>{currentType.desc}</p>
+            <h3 className="info-title"><Info size={18} /> {currentType.label} Insights</h3>
+            <p className="info-desc">{currentType.desc}</p>
             
-            <div className="stats-mini-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="stats-mini-grid">
               <div className="stat-box">
-                <span style={{ fontSize: '12px', color: '#64748b' }}>Sessions</span>
-                <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatNumber(data?.heatmap?.sessionCount || 0)}</div>
+                <span className="stat-caption">Sessions</span>
+                <div className="stat-value">{formatNumber(data?.heatmap?.sessionCount || 0)}</div>
               </div>
               <div className="stat-box">
-                <span style={{ fontSize: '12px', color: '#64748b' }}>Data Points</span>
-                <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatNumber(points.length)}</div>
+                <span className="stat-caption">Data Points</span>
+                <div className="stat-value">{formatNumber(points.length)}</div>
               </div>
             </div>
 
-            <div className="legend" style={{ marginTop: '2rem' }}>
+            <div className="legend">
               <div className="legend-item">
-                <div className="color-box" style={{ background: '#ef4444' }}></div>
-                <span>Highest {activeType === 'rage' ? 'Frustration' : 'Attention'}</span>
+                <div className="color-box" style={{ background: 'var(--heat-hot)' }}></div>
+                <span>Highest Attention</span>
               </div>
               <div className="legend-item">
-                <div className="color-box" style={{ background: '#f59e0b' }}></div>
+                <div className="color-box" style={{ background: 'var(--heat-warm)' }}></div>
                 <span>Medium Engagement</span>
               </div>
               <div className="legend-item">
-                <div className="color-box" style={{ background: '#3b82f6' }}></div>
+                <div className="color-box" style={{ background: 'var(--heat-cool)' }}></div>
                 <span>Low Interest</span>
+              </div>
+              <div className="legend-item">
+                <div className="color-box" style={{ background: 'var(--heat-cold)' }}></div>
+                <span>Minimal Activity</span>
               </div>
             </div>
           </div>
 
-          <div className="info-card" style={{ background: 'rgba(59, 130, 246, 0.05)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
-            <h3 style={{ color: '#3b82f6' }}>Segment Filter</h3>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-              <button
-                className="control-item"
-                style={{ flex: 1, fontSize: '12px', opacity: segment === 'desktop' ? 1 : 0.75 }}
-                onClick={() => setSegment((prev) => (prev === 'desktop' ? 'all' : 'desktop'))}
-              >
-                Desktop
-              </button>
-              <button
-                className="control-item"
-                style={{ flex: 1, fontSize: '12px', opacity: segment === 'mobile' ? 1 : 0.75 }}
-                onClick={() => setSegment((prev) => (prev === 'mobile' ? 'all' : 'mobile'))}
-              >
-                Mobile
-              </button>
-            </div>
-            <p style={{ marginTop: 10, fontSize: 12, color: '#64748b' }}>
-              Filtering: {segmentKey === 'all' ? 'All devices' : segmentKey}
-            </p>
-          </div>
+
         </aside>
       </div>
     </div>

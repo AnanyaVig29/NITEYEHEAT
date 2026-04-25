@@ -22,16 +22,14 @@ function clamp(value, min, max) {
 
 function derivePatternDistribution(points) {
   if (!points.length) {
-    return {
-      f: 0,
-      z: 0,
-      layerCake: 0,
-      spotted: 0,
-    };
+    return { f: 0, z: 0, layerCake: 0, spotted: 0 };
   }
 
-  const xs = points.map((p) => p.x);
-  const ys = points.map((p) => p.y);
+  // Focus on the most recent 1000 points for real-time reactivity
+  const activePoints = points.slice(0, 1000);
+  const xs = activePoints.map((p) => p.x);
+  const ys = activePoints.map((p) => p.y);
+  
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
@@ -42,42 +40,50 @@ function derivePatternDistribution(points) {
 
   let leftHits = 0;
   let topHits = 0;
-  let rowBandHits = 0;
+  let middleHits = 0;
+  let bottomHits = 0;
+  let diagonalHits = 0;
 
   const grid = new Set();
 
-  for (const p of points) {
+  for (const p of activePoints) {
     const nx = (p.x - minX) / xRange;
     const ny = (p.y - minY) / yRange;
 
-    if (nx < 0.35) leftHits += 1;
-    if (ny < 0.35) topHits += 1;
-
-    const yBand = Math.floor(ny * 5);
-    if (yBand === 0 || yBand === 1 || yBand === 3) rowBandHits += 1;
+    if (nx < 0.3) leftHits += 1;
+    if (ny < 0.3) topHits += 1;
+    if (ny >= 0.4 && ny <= 0.6) middleHits += 1;
+    if (ny > 0.7) bottomHits += 1;
+    
+    // Diagonal for Z-pattern (top-right to bottom-left)
+    if (Math.abs((1 - nx) - ny) < 0.2) diagonalHits += 1;
 
     const gx = clamp(Math.floor(nx * 4), 0, 3);
     const gy = clamp(Math.floor(ny * 4), 0, 3);
     grid.add(`${gx}:${gy}`);
   }
 
-  const total = points.length;
+  const total = activePoints.length;
   const leftRatio = leftHits / total;
   const topRatio = topHits / total;
-  const rowBandRatio = rowBandHits / total;
+  const midRatio = middleHits / total;
+  const botRatio = bottomHits / total;
+  const diagRatio = diagonalHits / total;
   const spreadRatio = grid.size / 16;
 
-  const f = clamp(Math.round((leftRatio * 0.55 + topRatio * 0.45) * 100), 0, 100);
-  const layerCake = clamp(Math.round(rowBandRatio * 100), 0, 100);
+  // F-Pattern: Heavy top and left vertical
+  const f = clamp(Math.round((leftRatio * 0.6 + topRatio * 0.4) * 100), 0, 100);
+  
+  // Z-Pattern: Top, Diagonal, and Bottom
+  const z = clamp(Math.round((topRatio * 0.3 + diagRatio * 0.4 + botRatio * 0.3) * 100), 0, 100);
+  
+  // Layer Cake: Concentrated horizontal bands (top and middle)
+  const layerCake = clamp(Math.round((topRatio * 0.5 + midRatio * 0.5) * 100), 0, 100);
+  
+  // Spotted: High spread across the grid
   const spotted = clamp(Math.round(spreadRatio * 100), 0, 100);
-  const z = clamp(Math.round((100 - Math.abs(f - 60) - Math.abs(layerCake - 50) + spotted) / 2), 0, 100);
 
-  return {
-    f,
-    z,
-    layerCake,
-    spotted,
-  };
+  return { f, z, layerCake, spotted };
 }
 
 function deriveScrollDepth(points) {
@@ -277,7 +283,6 @@ function getLiveStats(_req, res) {
     gaze: recentPoints.filter(p => p.type === 'gaze' || !p.type),
     click: recentPoints.filter(p => p.type === 'click'),
     move: recentPoints.filter(p => p.type === 'move'),
-    rage: recentPoints.filter(p => p.type === 'rage'),
     scroll: recentPoints, // Scroll uses all points for depth
   };
 
@@ -287,14 +292,12 @@ function getLiveStats(_req, res) {
       gaze: segmentedPoints.gaze.filter((p) => p.device !== 'mobile'),
       click: segmentedPoints.click.filter((p) => p.device !== 'mobile'),
       move: segmentedPoints.move.filter((p) => p.device !== 'mobile'),
-      rage: segmentedPoints.rage.filter((p) => p.device !== 'mobile'),
       scroll: segmentedPoints.scroll.filter((p) => p.device !== 'mobile'),
     },
     mobile: {
       gaze: segmentedPoints.gaze.filter((p) => p.device === 'mobile'),
       click: segmentedPoints.click.filter((p) => p.device === 'mobile'),
       move: segmentedPoints.move.filter((p) => p.device === 'mobile'),
-      rage: segmentedPoints.rage.filter((p) => p.device === 'mobile'),
       scroll: segmentedPoints.scroll.filter((p) => p.device === 'mobile'),
     },
   };
