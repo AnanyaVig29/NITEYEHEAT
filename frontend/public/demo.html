@@ -1,11 +1,636 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=/demo.thml" />
-  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EyeHeat Live Demo</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #142132;
+      --muted: #64748b;
+      --accent: #b46445;
+      --accent-dark: #8a4b33;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Segoe UI, Tahoma, sans-serif;
+      background: radial-gradient(circle at 20% 20%, #eef2ff, transparent 40%), var(--bg);
+      color: var(--ink);
+      position: relative;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .webcam-preview {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 240px;
+      height: 180px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #ffffff;
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.28);
+      z-index: 1000;
+      background: #0f172a;
+    }
+
+    .webcam-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .status {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .heatmap {
+      position: relative;
+      height: 420px;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.08), transparent 42%),
+        radial-gradient(circle at 75% 70%, rgba(239, 68, 68, 0.08), transparent 40%),
+        #f8fafc;
+    }
+
+    .kpis {
+      display: grid;
+      gap: 12px;
+    }
+
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .kpi .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi .value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 6px;
+      color: var(--accent);
+    }
+
+    .rows {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .heatmap {
+        height: 320px;
+      }
+    }
+  </style>
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
 </head>
+
 <body>
-  <p>Redirecting to live demo...</p>
+  <div id="fullpage-heatmap"
+    style="position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;">
+  </div>
+  <div id="webcamPreview" class="webcam-preview" style="display:none;"></div>
+  <div class="header">
+    <div>
+      <div class="title">EyeHeat Live Demo</div>
+      <div class="status" id="status">Idle. Click Start Tracking.</div>
+    </div>
+    <div class="controls">
+      <button class="btn-primary" id="startBtn">Start Webcam</button>
+      <button class="btn-secondary" id="stopBtn">Stop Webcam</button>
+      <button class="btn-primary" id="recordBtn" style="background:#dc2626;">Record Screen</button>
+      <button class="btn-secondary" id="stopRecordBtn" style="display:none;">Stop Recording</button>
+      <button class="btn-secondary" onclick="window.location.href='/'">Return to Dashboard</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <h3>Live Heatmap</h3>
+      <p class="status">This heatmap is generated from live gaze points pushed to backend every 3 seconds.</p>
+      <div id="heatmap" class="heatmap"></div>
+    </div>
+
+    <div class="card">
+      <h3>Live KPIs</h3>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Sessions</div>
+          <div class="value" id="sessions">0</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Gaze Points</div>
+          <div class="value" id="points">0</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Bounce Rate</div>
+          <div class="value" id="bounce">0.0%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Avg Session Time</div>
+          <div class="value" id="duration">0s</div>
+        </div>
+      </div>
+
+      <div class="rows" id="topPages"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_PORT_CANDIDATES = [3001, 3002, 3003, 3004, 3005, 3010];
+    const FLUSH_INTERVAL_MS = 250;
+    const STATS_INTERVAL_MS = 350;
+    const MAX_BATCH_SIZE = 8;
+
+    const statusEl = document.getElementById('status');
+    const sessionsEl = document.getElementById('sessions');
+    const pointsEl = document.getElementById('points');
+    const bounceEl = document.getElementById('bounce');
+    const durationEl = document.getElementById('duration');
+    const topPagesEl = document.getElementById('topPages');
+
+    const state = {
+      active: false,
+      sessionId: '',
+      localPoints: [],
+      uploadQueue: [],
+      batchTimer: null,
+      statsTimer: null,
+      renderTimer: null,
+      heatmap: null,
+      heatmapGlobal: null,
+      mediaRecorder: null,
+      recordedChunks: [],
+      lastStatsAt: 0,
+      apiBase: '',
+      flushInFlight: false,
+      statsInFlight: false,
+    };
+
+    function buildApiCandidates() {
+      const host = window.location.hostname || 'localhost';
+      const protocol = window.location.protocol || 'http:';
+      const candidates = API_PORT_CANDIDATES.map((port) => `${protocol}//${host}:${port}/api`);
+      if (host === 'localhost') {
+        candidates.push(...API_PORT_CANDIDATES.map((port) => `${protocol}//127.0.0.1:${port}/api`));
+      }
+      return [...new Set(candidates)];
+    }
+
+    function apiUrl(path) {
+      if (!state.apiBase) {
+        throw new Error('API base URL is not initialized');
+      }
+      return `${state.apiBase}${path}`;
+    }
+
+    async function detectApiBase() {
+      const candidates = buildApiCandidates();
+      for (const base of candidates) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const res = await fetch(`${base.replace(/\/api$/, '')}/health`, { cache: 'no-store' });
+          if (res.ok) {
+            state.apiBase = base;
+            return base;
+          }
+        } catch (_err) {
+          // Try next candidate.
+        }
+      }
+      throw new Error('Backend not reachable on expected ports');
+    }
+
+    function formatDuration(ms) {
+      const sec = Math.round((ms || 0) / 1000);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return m ? `${m}m ${s}s` : `${s}s`;
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function normalizePoints(points, width, height) {
+      if (!points.length) return [];
+      const xs = points.map((p) => p.x);
+      const ys = points.map((p) => p.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const xRange = Math.max(1, maxX - minX);
+      const yRange = Math.max(1, maxY - minY);
+
+      return points.map((p) => ({
+        x: Math.round(((p.x - minX) / xRange) * Math.max(1, width - 12) + 6),
+        y: Math.round(((p.y - minY) / yRange) * Math.max(1, height - 12) + 6),
+        value: 1,
+      }));
+    }
+
+    function renderHeatmap() {
+      const now = Date.now();
+      // Keep only points from the last 2 seconds max
+      state.localPoints = state.localPoints.filter(p => now - p.ts <= 2000);
+
+      if (state.heatmap) {
+        const container = document.getElementById('heatmap');
+        const dataBox = normalizePoints(state.localPoints, container.clientWidth, container.clientHeight);
+        state.heatmap.setData({ max: 8, data: dataBox });
+      }
+
+      if (state.heatmapGlobal) {
+        const dataGlobal = state.localPoints.map(p => ({
+          x: Math.round(p.x),
+          y: Math.round(p.y),
+          value: 1
+        }));
+        state.heatmapGlobal.setData({ max: 8, data: dataGlobal });
+      }
+    }
+
+    function renderServerHeatmap(points) {
+      if (!Array.isArray(points)) return;
+      const recent = points.slice(-1200);
+      const heatmapContainer = document.getElementById('heatmap');
+      const dataBox = normalizePoints(recent, heatmapContainer.clientWidth, heatmapContainer.clientHeight);
+
+      if (state.heatmap) {
+        state.heatmap.setData({ max: 8, data: dataBox });
+      }
+
+      if (state.heatmapGlobal) {
+        const vw = Math.max(1, window.innerWidth);
+        const vh = Math.max(1, window.innerHeight);
+        const dataGlobal = recent.map((p) => ({
+          x: Math.round(Math.min(Math.max(p.x, 0), vw - 1)),
+          y: Math.round(Math.min(Math.max(p.y, 0), vh - 1)),
+          value: 1,
+        }));
+        state.heatmapGlobal.setData({ max: 8, data: dataGlobal });
+      }
+    }
+
+    async function fetchStats() {
+      if (state.statsInFlight) return;
+      state.statsInFlight = true;
+      const res = await fetch(apiUrl('/stats/live'), { cache: 'no-store' });
+      try {
+        if (!res.ok) throw new Error(`Stats request failed (${res.status})`);
+        const data = await res.json();
+        const totals = data.totals || {};
+        state.lastStatsAt = Date.now();
+
+        sessionsEl.textContent = `${totals.sessions || 0}`;
+        pointsEl.textContent = `${totals.points || 0}`;
+        bounceEl.textContent = `${Number(totals.bounceRate || 0).toFixed(1)}%`;
+        durationEl.textContent = formatDuration(totals.avgDurationMs || 0);
+        renderServerHeatmap(data.heatmap?.points || []);
+
+        topPagesEl.innerHTML = '';
+        (data.topPages || []).slice(0, 4).forEach((page) => {
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = `<span>${page.page}</span><strong>${page.sessions} sessions</strong>`;
+          topPagesEl.appendChild(row);
+        });
+      } finally {
+        state.statsInFlight = false;
+      }
+    }
+
+    async function flushBatch() {
+      if (!state.sessionId || !state.uploadQueue.length || state.flushInFlight) return;
+      state.flushInFlight = true;
+      const points = state.uploadQueue.slice();
+      state.uploadQueue = [];
+      try {
+        await fetch(apiUrl('/gaze/batch'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: state.sessionId, points }),
+        });
+        await fetchStats();
+      } finally {
+        state.flushInFlight = false;
+      }
+    }
+
+    function attachWebcamPreview() {
+      const host = document.getElementById('webcamPreview');
+      if (!host) return;
+
+      let attempts = 0;
+      const timer = setInterval(() => {
+        const video = document.getElementById('webgazerVideoFeed');
+        if (!video) {
+          attempts += 1;
+          if (attempts > 40) clearInterval(timer);
+          return;
+        }
+        host.style.display = 'block';
+        host.appendChild(video);
+        clearInterval(timer);
+      }, 100);
+    }
+
+    async function startTracking() {
+      if (state.active) return;
+
+      try {
+        const startRes = await fetch(apiUrl('/gaze/start'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pageUrl: window.location.href }),
+        });
+
+        if (!startRes.ok) throw new Error('Unable to create session');
+        const started = await startRes.json();
+        state.sessionId = started.sessionId;
+
+        await window.webgazer
+          .setRegression('ridge')
+          .setTracker('TFFacemesh')
+          .setGazeListener((data) => {
+            if (!data || !state.active) return;
+            const point = { x: data.x, y: data.y, ts: Date.now() };
+            state.localPoints.push(point);
+            state.uploadQueue.push(point);
+            if (state.uploadQueue.length >= MAX_BATCH_SIZE) {
+              flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
+            }
+            pointsEl.textContent = (parseInt(pointsEl.textContent) || 0) + 1;
+            renderHeatmap();
+          })
+          .begin();
+
+        window.webgazer.showVideoPreview(true);
+        window.webgazer.showFaceOverlay(false);
+        window.webgazer.showPredictionPoints(false);
+        attachWebcamPreview();
+
+        state.active = true;
+        state.batchTimer = setInterval(() => {
+          flushBatch().catch((err) => setStatus(`Upload error: ${err.message}`));
+        }, FLUSH_INTERVAL_MS);
+        state.statsTimer = setInterval(() => {
+          fetchStats().catch((err) => setStatus(`Live stats error: ${err.message}`));
+        }, STATS_INTERVAL_MS);
+        state.renderTimer = setInterval(renderHeatmap, 120);
+
+        setStatus(`Tracking live. Session: ${state.sessionId.slice(0, 8)}...`);
+        await fetchStats().catch((err) => setStatus(`Live stats error: ${err.message}`));
+      } catch (err) {
+        setStatus(`Start failed: ${err.message}`);
+      }
+    }
+
+    async function stopTracking() {
+      if (!state.active) return;
+
+      state.active = false;
+      clearInterval(state.batchTimer);
+      clearInterval(state.statsTimer);
+      clearInterval(state.renderTimer);
+      state.batchTimer = null;
+      state.statsTimer = null;
+      state.renderTimer = null;
+
+      await flushBatch();
+
+      if (state.sessionId) {
+        await fetch(apiUrl('/gaze/end'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: state.sessionId }),
+        });
+      }
+
+      try {
+        window.webgazer.clearGazeListener();
+        window.webgazer.end();
+      } catch (_err) {
+        // no-op
+      }
+      const preview = document.getElementById('webcamPreview');
+      if (preview) preview.style.display = 'none';
+
+      setStatus('Tracking stopped. Metrics remain live from backend.');
+      state.sessionId = '';
+      await fetchStats().catch((err) => setStatus(`Live stats error: ${err.message}`));
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (state.active) {
+        stopTracking();
+      }
+    });
+
+    document.getElementById('startBtn').addEventListener('click', startTracking);
+    document.getElementById('stopBtn').addEventListener('click', stopTracking);
+
+    const recordBtn = document.getElementById('recordBtn');
+    const stopRecordBtn = document.getElementById('stopRecordBtn');
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        state.mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        state.recordedChunks = [];
+
+        state.mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) state.recordedChunks.push(e.data);
+        };
+
+        state.mediaRecorder.onstop = () => {
+          const blob = new Blob(state.recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = `EyeHeat-Recording-${Date.now()}.webm`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+
+          recordBtn.style.display = 'inline-block';
+          stopRecordBtn.style.display = 'none';
+          setStatus('Recording saved successfully.');
+        };
+
+        // Stop recording if user stops sharing from browser UI
+        stream.getVideoTracks()[0].onended = () => {
+          stopRecording();
+        };
+
+        state.mediaRecorder.start();
+        recordBtn.style.display = 'none';
+        stopRecordBtn.style.display = 'inline-block';
+        setStatus('Recording screen...');
+      } catch (err) {
+        setStatus(`Recording failed: ${err.message}`);
+      }
+    }
+
+    function stopRecording() {
+      if (state.mediaRecorder && state.mediaRecorder.state !== 'inactive') {
+        state.mediaRecorder.stop();
+        if (state.mediaRecorder.stream && state.mediaRecorder.stream.getTracks) {
+          state.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        }
+      }
+    }
+
+    recordBtn.addEventListener('click', startRecording);
+    stopRecordBtn.addEventListener('click', stopRecording);
+
+    state.heatmap = window.h337.create({
+      container: document.getElementById('heatmap'),
+      radius: 28,
+      maxOpacity: 0.72,
+      minOpacity: 0.05,
+      blur: 0.86,
+      gradient: {
+        0.2: '#3b82f6',
+        0.45: '#22c55e',
+        0.7: '#f59e0b',
+        1.0: '#ef4444',
+      },
+    });
+
+    state.heatmapGlobal = window.h337.create({
+      container: document.getElementById('fullpage-heatmap'),
+      radius: 50,
+      maxOpacity: 0.7,
+      minOpacity: 0.02,
+      blur: 0.90,
+      gradient: {
+        0.2: '#3b82f6',
+        0.45: '#22c55e',
+        0.7: '#f59e0b',
+        1.0: '#ef4444',
+      },
+    });
+
+    async function initLiveLoop() {
+      await detectApiBase();
+      setStatus(`Connected to API: ${state.apiBase}`);
+      setInterval(() => {
+        fetchStats().catch((err) => {
+          if (Date.now() - state.lastStatsAt > 5000) {
+            setStatus(`Waiting for API at ${state.apiBase || 'detected ports'} (${err.message})`);
+          }
+        });
+      }, STATS_INTERVAL_MS);
+      fetchStats().catch((err) => setStatus(`Waiting for API at ${state.apiBase} (${err.message})`));
+    }
+
+    initLiveLoop().catch((err) => setStatus(`Waiting for API (${err.message})`));
+  </script>
 </body>
+
 </html>

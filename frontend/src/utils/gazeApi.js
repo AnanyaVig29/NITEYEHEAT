@@ -68,8 +68,12 @@ export function startBatchInterval(sessionId, getPoints, clearBuffer, onSaved) {
     const points = getPoints();
     if (!points.length) return;
 
-    const result = await postBatch(sessionId, points);
-    clearBuffer();
-    onSaved?.(result?.saved || points.length);
+    try {
+      const result = await postBatch(sessionId, points);
+      clearBuffer();
+      onSaved?.(result?.saved || points.length);
+    } catch (err) {
+      console.error('Failed to post gaze batch:', err);
+    }
   }, 5000);
 }

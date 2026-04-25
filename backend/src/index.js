@@ -43,6 +43,29 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`EyeHeat API running on :${PORT}`);
-});
+function boot(startPort, maxAttempts = 20) {
+  let attempts = 0;
+
+  const start = (port) => {
+    const server = app.listen(port, () => {
+      console.log(`EyeHeat API running on :${port}`);
+    });
+
+    server.once('error', (err) => {
+      if (err && err.code === 'EADDRINUSE' && attempts < maxAttempts - 1) {
+        attempts += 1;
+        const nextPort = port + 1;
+        console.warn(`[api] Port ${port} is busy; trying ${nextPort}`);
+        start(nextPort);
+        return;
+      }
+
+      console.error('[api] Failed to start server', err);
+      process.exit(1);
+    });
+  };
+
+  start(startPort);
+}
+
+boot(PORT);

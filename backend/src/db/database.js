@@ -1,15 +1,38 @@
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
 
 const DB_PATH = path.join(__dirname, '../../eyeheat.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
-const db = new Database(DB_PATH);
+function createDatabase() {
+  try {
+    const BetterSqlite3 = require('better-sqlite3');
+    return new BetterSqlite3(DB_PATH);
+  } catch (error) {
+    // Some local environments keep a stale native module build.
+    // Fallback keeps the API online on supported Node versions.
+    if (error && error.code === 'ERR_DLOPEN_FAILED') {
+      console.warn(
+        '[db] better-sqlite3 failed to load; falling back to node:sqlite. ' +
+          'Run `npm rebuild better-sqlite3` in `backend` to restore native driver performance.'
+      );
+      const { DatabaseSync } = require('node:sqlite');
+      return new DatabaseSync(DB_PATH);
+    }
+    throw error;
+  }
+}
+
+const db = createDatabase();
 
 // WAL improves read/write behavior when sessions and reports overlap.
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+if (typeof db.pragma === 'function') {
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
+} else {
+  db.exec('PRAGMA journal_mode = WAL;');
+  db.exec('PRAGMA foreign_keys = ON;');
+}
 
 db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
 

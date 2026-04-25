@@ -9,6 +9,7 @@ import {
   getSessions,
   startBatchInterval,
   startSession,
+  postBatch,
 } from '../utils/gazeApi';
 
 export default function GazeTracker() {
@@ -20,6 +21,7 @@ export default function GazeTracker() {
   const [savedPoints, setSavedPoints] = useState(0);
   const [sessions, setSessions] = useState([]);
   const [error, setError] = useState('');
+  const [pointCount, setPointCount] = useState(0);
 
   const renderBuffer = useGazeBuffer(2000);
   const uploadQueueRef = useRef([]);
@@ -42,8 +44,16 @@ export default function GazeTracker() {
       setStatus('error');
     },
   });
-
-  const pointCount = renderBuffer.getSize();
+  // Track point count in state to trigger re-renders periodically
+  useEffect(() => {
+    let interval;
+    if (trackingActive) {
+      interval = setInterval(() => {
+        setPointCount(renderBuffer.getSize());
+      }, 500);
+    }
+    return () => clearInterval(interval);
+  }, [trackingActive, renderBuffer]);
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -73,8 +83,9 @@ export default function GazeTracker() {
       try {
         const pending = uploadQueueRef.current;
         if (pending.length) {
-          // Let interval submit pending data first on next cycle, but still end session gracefully.
-          uploadQueueRef.current = [];
+          // Flush the remaining points directly instead of relying on the cleared interval
+          await postBatch(sessionId, pending);
+          setSavedPoints((prev) => prev + pending.length);
         }
         await endSession(sessionId);
       } catch (_err) {

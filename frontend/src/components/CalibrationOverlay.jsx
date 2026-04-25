@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const POINTS = [
   { id: 0, x: '10%', y: '10%' },
@@ -12,54 +12,63 @@ const POINTS = [
   { id: 8, x: '90%', y: '90%' },
 ];
 
-const CLICKS_NEEDED = 5;
-
 export default function CalibrationOverlay({ onComplete }) {
-  const [counts, setCounts] = useState({});
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const completed = useMemo(
-    () => POINTS.every((p) => (counts[p.id] || 0) >= CLICKS_NEEDED),
-    [counts]
-  );
-
-  const handleClick = (id, event) => {
-    if (window.webgazer?.recordScreenPosition) {
-      window.webgazer.recordScreenPosition(event.clientX, event.clientY, 'click');
+  useEffect(() => {
+    if (currentIndex >= POINTS.length) {
+      const timer = setTimeout(() => onComplete?.(), 500);
+      return () => clearTimeout(timer);
     }
 
-    setCounts((prev) => {
-      const next = { ...prev, [id]: (prev[id] || 0) + 1 };
-      const done = POINTS.every((p) => (next[p.id] || 0) >= CLICKS_NEEDED);
-      if (done) {
-        onComplete?.();
+    const timer = setTimeout(() => {
+      // Find the screen position
+      const point = POINTS[currentIndex];
+      const el = document.getElementById(`cal-dot-${point.id}`);
+      if (el && window.webgazer?.recordScreenPosition) {
+        const rect = el.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        
+        // Record multiple times to simulate clicks
+        for (let i = 0; i < 5; i++) {
+          window.webgazer.recordScreenPosition(x, y, 'click');
+        }
       }
-      return next;
-    });
-  };
+      setCurrentIndex((prev) => prev + 1);
+    }, 1500); // 1.5s per dot
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, onComplete]);
 
   return (
     <div className="calibration-overlay">
-      {POINTS.map((p) => {
-        const currentCount = counts[p.id] || 0;
-        const done = currentCount >= CLICKS_NEEDED;
+      {POINTS.map((p, i) => {
+        const isCurrent = i === currentIndex;
+        const isDone = i < currentIndex;
 
         return (
-          <button
+          <div
             key={p.id}
-            onClick={(e) => handleClick(p.id, e)}
-            className={`calibration-dot ${done ? 'done' : ''}`}
-            style={{ left: p.x, top: p.y }}
-            type="button"
-            aria-label={`Calibration point ${p.id + 1}`}
+            id={`cal-dot-${p.id}`}
+            className={`calibration-dot ${isDone ? 'done' : ''}`}
+            style={{ 
+              left: p.x, 
+              top: p.y,
+              transform: isCurrent ? 'translate(-50%, -50%) scale(1.5)' : 'translate(-50%, -50%) scale(1)',
+              background: isCurrent ? '#f59e0b' : (isDone ? '#10b981' : '#b46445'),
+              opacity: (isCurrent || isDone) ? 1 : 0.5,
+              transition: 'all 0.3s ease'
+            }}
           >
-            <span>{Math.min(currentCount, CLICKS_NEEDED)}/{CLICKS_NEEDED}</span>
-          </button>
+            {isCurrent && <span style={{fontSize: '12px', marginTop: '40px', display: 'block', width: '100px', textAlign: 'center', marginLeft: '-35px'}}>Focus Here</span>}
+          </div>
         );
       })}
 
       <div className="calibration-message">
-        <p>Click each point {CLICKS_NEEDED} times to finish calibration.</p>
-        <p>{completed ? 'Calibration complete.' : 'Keep your head still and click all points.'}</p>
+        <p>Follow the orange dot. Keep your head still.</p>
+        <p>{currentIndex >= POINTS.length ? 'Calibration complete.' : `Calibrating point ${currentIndex + 1} of 9...`}</p>
       </div>
     </div>
   );

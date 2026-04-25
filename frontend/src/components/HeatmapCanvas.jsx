@@ -30,7 +30,7 @@ export default function HeatmapCanvas({ getPoints, active }) {
 
   useEffect(() => {
     if (!active || !heatmapRef.current) {
-      cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) clearInterval(rafRef.current);
       return;
     }
 
@@ -47,14 +47,12 @@ export default function HeatmapCanvas({ getPoints, active }) {
           data: points,
         });
       }
-
-      rafRef.current = requestAnimationFrame(draw);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    rafRef.current = setInterval(draw, 500); // Draw every 500ms
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      clearInterval(rafRef.current);
     };
   }, [active, getPoints]);
 
