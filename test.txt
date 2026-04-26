@@ -1,57 +1,128 @@
-mplementation Plan
+EyeHeat Feature Implementation Plan
+Based on test.txt, all features from Phases 1–4 need to be implemented. Here's my analysis of what already exists and what truly needs to be built.
 
-Start with a foundation phase, then build features in the order that gives the most value and the least risk.
+What Already Exists
+Feature	Status
+Responsive coordinate normalization	✅ Done (LiveHeatmapPanel, useWebGazer clamp)
+Fixation filtering (velocity + smoothing)	✅ Done (useWebGazer)
+Dynamic calibration / quick recalibrate	✅ Done (CalibrationOverlay)
+Privacy mode (hide video feed)	✅ Done (GazeTracker)
+Saccade pathing (Canvas draw)	✅ Done (SaccadePathCanvas)
+Attention score	✅ Done (statsController + GazeTracker)
+AOI statistics (quadrant + missed zones)	✅ Done (statsController)
+Blindness alerts	✅ Done (missedZones in statsController)
+Responsive scaling	✅ Done (HeatmapCanvas interval + LiveHeatmapPanel)
+Session export (JSON)	✅ Done (Sessions.jsx + sessionController)
+What Needs to Be Built
+Phase 3: Accessibility Features (Missing)
+Dwell-clicking — GazeTracker has the logic but it's not working: handlePagePointActions only runs on a stale lastPagePointRef and the state deps cause bugs. Needs a ref-based fix.
+Gaze scrolling — Same file, same bug. Scroll triggers fire but the scroll timer accumulates uncleared intervals.
+Blink triggers — No MediaPipe/blink detection exists. This is the hardest item and requires a new hook.
+Phase 4: Analytics Features (Partially Missing)
+Better session summaries / per-page heatmap metrics — Sessions page shows placeholder engagement bar (hardcoded 75%). Needs real per-session fixation stats.
+AOI statistics UI — Backend computes it, but UI only shows raw attentionScore and missedZones as text. Needs a proper visualized AOI panel.
+Session export improvements — CSV export backend endpoint exists but no CSV download button in the UI.
+Phase 5: Technical Hardening (Missing)
+Analytics caching — getLiveStats queries the full DB on every poll (every 3s). Add a simple TTL cache to reduce load.
+Event logging — No structured logging for calibration quality, fixation confidence, or dwell-click events.
+Fixation filtering in buffer — The useGazeBuffer stores all points; fixation reduction (cluster nearby points) isn't applied before rendering/upload.
+Proposed Changes
+Frontend — Core Bug Fixes & Improvements
+[MODIFY] GazeTracker.jsx
+Fix the dwell-click and gaze-scroll logic: replace state-based tracking (dwellCandidate, dwellSince) with refs to avoid stale closure bugs. The page-point loop should reference a stable ref, not re-create callbacks on state change.
+Add getLiveStats import (it was called but never imported — this is actively broken).
+Add proper AOI panel display (show quadrant breakdown with visual bars, not just text).
+[MODIFY] useGazeBuffer.js
+Add a getFixations() method that returns cluster-reduced points: consecutive points within a 20px radius are merged into one centroid fixation. This reduces noise for rendering and upload.
+[MODIFY] SessionControls.jsx
+Add a "Export CSV" download button (calls existing /sessions/:id/csv backend endpoint for the active session).
+Show dwell-click indicator (highlight when a dwell is in progress).
+[NEW] frontend/src/hooks/useBlinkDetector.js
+Use WebGazer's face mesh data to estimate blink events (eye aspect ratio drop).
+Emit a callback when a blink is detected (≥2 consecutive frames below threshold).
+Expose onBlink prop so GazeTracker can wire blink-triggered actions.
+[NEW] frontend/src/components/AoiStatsPanel.jsx
+Visual AOI component: shows the 4 quadrant attention breakdown as colored bars.
+Shows time-to-first-fixation, missed zones with red highlight, and attention score gauge.
+[NEW] frontend/src/components/DwellIndicator.jsx
+Small overlay element that shows a growing circular progress ring over the element currently being dwelt on.
+Renders at the dwell candidate's position and resets on movement.
+Frontend — Styles
+[MODIFY] index.css (or new tracker CSS file)
+Styles for AoiStatsPanel, DwellIndicator.
+Backend — Analytics Caching & Logging
+[MODIFY] statsController.js
+Add a simple in-memory TTL cache (1.5 second window) so repeated calls in quick succession don't re-query SQLite.
+Add calibrationQuality, fixationCount, dwellCount fields to the response based on event log table.
+[NEW] backend/src/db/eventLog.js
+Helper to insert structured events: { type: 'calibration' | 'fixation' | 'dwell', sessionId, ts, metadata }.
+[MODIFY] backend/src/db/schema.sql + migrate.js
+Add event_log table: (id, session_id, type, ts, metadata TEXT).
+[MODIFY] gazeController.js
+Log a fixation event when a batch contains a cluster of ≥3 consecutive low-velocity points.
+[MODIFY] backend/src/routes/stats.js
+Expose GET /stats/session/:id/summary endpoint for per-session fixation stats used by the Sessions page.
+[MODIFY] sessionController.js
+listSessions response to include fixationCount from the event log join.
+Verification Plan
+Automated
+Run npm run dev in frontend and node src/index.js in backend, check no console errors.
+Verify stale import (getLiveStats) is resolved.
+Manual
+Start a tracking session → confirm dwell ring appears over buttons.
+Confirm gaze scrolling fires correctly without accumulating timers.
+Confirm blink hook fires onBlink in console.
+Confirm AOI panel shows quadrant bars.
+Confirm session CSV export button works on Sessions page.
+Confirm analytics polling has cached responses (check network tab — second call within 1.5s returns same generatedAt).
 
-Phase 1: Core tracking foundation
 
-Add responsive coordinate normalization so gaze points stay accurate across screen sizes.
-Add fixation filtering so noisy eye movement is reduced before any analytics or rendering.
-Add dynamic calibration with a quick one-dot recalibration flow to correct drift without restarting the session.
-Add privacy mode so video stays client-side and only gaze data or derived metrics are used.
-Phase 2: Real-time visualization
 
-Add saccade pathing using Canvas API so the app can draw the user’s gaze journey in order.
-Add attention score so the UI can show a live focus meter.
-Add blindness alerts so the system highlights important areas that never received gaze.
-Add responsive scaling so the same session can be reviewed properly on desktop, tablet, and mobile.
-Phase 3: Accessibility features
+Since your EyeHeat project already handles the core logic of tracking gaze movements, you can elevate it from a simple tracker to a comprehensive analytics or accessibility tool.
 
-Add dwell-clicking using JavaScript timers for hands-free interaction.
-Add gaze scrolling using the Window Scroll API for navigation by eye movement.
-Add blink triggers using OpenCV.js or MediaPipe for gesture-based actions like Back or Refresh.
-Phase 4: Analytics features
+Here are several features you can add, categorized by their application:
 
-Add AOI statistics using geometry logic and SQL so you can measure time to first fixation on buttons and key areas.
-Add session export using JSON and Blob Web APIs so researchers can download replayable session files.
-Add better session summaries and per-page heatmap metrics for reporting.
+1. Advanced Visualization & Analytics
+Beyond a standard heatmap, these features provide deeper insights into how a user processes information.
 
-Phase 5: Technical hardening
+Saccade & Gaze Path Mapping: Instead of just showing "hot" areas, draw lines and arrows (saccades) connecting the fixation points. This reveals the chronological order in which a user scanned the page.
 
-Cache live analytics results briefly to reduce latency.
-Add event logging for calibration quality, fixation confidence, and dwell actions.
-Add test coverage for coordinate mapping, fixation filtering, and session export.
-Recommended build order
+AOI (Area of Interest) Statistics: Allow users to draw boxes around specific elements (like a "Buy Now" button). The system can then calculate:
 
-Responsive scaling
-Fixation filtering
-Dynamic calibration
-Privacy mode
-Saccade pathing
-AOI statistics
-Session export
-Attention score
-Blindness alerts
-Dwell-clicking
-Gaze scrolling
-Blink triggers
-Best first MVP
-If you want the highest value with the least complexity, I would start with:
+Time to First Fixation: How long it took the user to notice the element.
 
-Responsive scaling
-Fixation filtering
-Dynamic calibration
-Saccade pathing
-AOI statistics
-That gives you a stronger analytics product before adding the harder accessibility interactions.
+Dwell Time: The total time spent looking at that specific box.
 
-If you want, I can turn this into a step-by-step technical roadmap with files, com
+Fixation Filtering: Add a toggle to filter out "noise" (fast eye movements) and only show points where the gaze rested for more than 200–300ms, indicating actual cognitive processing.
+
+2. Interaction & Accessibility (Gaze-to-Action)
+Transform the project into a functional tool for users with motor disabilities or for "hands-free" interfaces.
+
+Dwell-Clicking: Implement a feature where if a user stares at a button or link for a set duration (e.g., 1 second), a "click" is triggered. Include a visual "loading" circle around the cursor to show the progress.
+
+Gaze-Based Scrolling: If the user looks at the bottom 10% of the screen, the page automatically scrolls down; looking at the top scrolls it up.
+
+Blink Detection for Actions: Use blink duration to trigger specific events—for example, a long blink (1 second) could act as a "Back" button or open a menu.
+
+3. Real-Time Engagement Monitoring
+These features are highly valuable for EdTech (like your BCA coursework) or marketing research.
+
+Attention Score: Create a real-time "Engagement Meter" that drops if the user’s gaze leaves the main content area or the screen entirely.
+
+Content "Blindness" Alerts: If the system detects the user has looked everywhere except a crucial piece of information (like a "Terms and Conditions" checkbox), it can subtly highlight that area to guide them.
+
+Exportable Sessions: Allow users to record their gaze session and export it as a video or a JSON file for later analysis.
+
+4. Technical Enhancements
+To make the project more robust and professional:
+
+Dynamic Recalibration: Add a "quick-fix" calibration button that the user can look at if they notice the accuracy drifting during a session.
+
+Multi-Device Scaling: If you are building this for the web, ensure the gaze coordinates map correctly across different screen resolutions and window sizes.
+
+Privacy Mode (Local Processing): Since eye tracking involves camera data, ensure all processing happens on the client side (using TensorFlow.js or similar) and never sends raw video to a server.
+
+Suggested Next Step
+Since you have a strong background in React and GSAP, you could use GSAP to animate the "Gaze Path" lines as they appear in real-time, making the data visualization look extremely fluid and high-end.
+
+Which of these directions—analytics or accessibility—interests you more for this project?
