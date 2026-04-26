@@ -1,4 +1,10 @@
 const db = require('../db/database');
+const { logEvent, countEvents } = require('../db/eventLog');
+
+// Simple TTL cache — prevents hammering SQLite on rapid 3s polls
+const CACHE_TTL_MS = 1500;
+let statsCache = null;
+let statsCachedAt = 0;
 
 function getPathFromUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') return '/';
@@ -18,6 +24,75 @@ function toPct(value) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function deriveAoiStats(points) {
+  if (!points.length) {
+    return {
+      quadrants: {
+        topLeft: 0,
+        topRight: 0,
+        bottomLeft: 0,
+        bottomRight: 0,
+      },
+      attentionScore: 0,
+      missedZones: [],
+      timeToFirstFixationMs: null,
+    };
+  }
+
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const xMid = minX + (maxX - minX) / 2;
+  const yMid = minY + (maxY - minY) / 2;
+
+  const quadrants = {
+    topLeft: 0,
+    topRight: 0,
+    bottomLeft: 0,
+    bottomRight: 0,
+  };
+
+  let firstFixationAt = null;
+  let currentRun = 1;
+  for (let i = 0; i < points.length; i += 1) {
+    const p = points[i];
+    const key = p.x <= xMid ? (p.y <= yMid ? 'topLeft' : 'bottomLeft') : p.y <= yMid ? 'topRight' : 'bottomRight';
+    quadrants[key] += 1;
+
+    if (i > 0) {
+      const prev = points[i - 1];
+      const dist = Math.hypot(p.x - prev.x, p.y - prev.y);
+      if (dist <= 20) {
+        currentRun += 1;
+        if (currentRun >= 3 && firstFixationAt === null) {
+          firstFixationAt = p.ts - points[0].ts;
+        }
+      } else {
+        currentRun = 1;
+      }
+    }
+  }
+
+  const total = points.length;
+  const activeZones = Object.values(quadrants).filter((count) => count > 0).length;
+  const spreadRatio = activeZones / 4;
+  const attentionScore = clamp(Math.round(((firstFixationAt ? 100 - Math.min(firstFixationAt / 20, 100) : 50) + spreadRatio * 100) / 2), 0, 100);
+
+  const missedZones = Object.entries(quadrants)
+    .filter(([, count]) => count === 0)
+    .map(([label]) => label);
+
+  return {
+    quadrants,
+    attentionScore,
+    missedZones,
+    timeToFirstFixationMs: firstFixationAt,
+  };
 }
 
 function derivePatternDistribution(points) {
@@ -186,6 +261,12 @@ function deriveTopElements(points) {
 }
 
 function getLiveStats(_req, res) {
+  // Return cached response if within TTL window
+  const now = Date.now();
+  if (statsCache && (now - statsCachedAt) < CACHE_TTL_MS) {
+    return res.json(statsCache);
+  }
+
   const sessions = db
     .prepare(
       `SELECT
@@ -306,6 +387,7 @@ function getLiveStats(_req, res) {
   const sectionEngagement = deriveSectionEngagement(recentPoints);
   const topElements = deriveTopElements(recentPoints);
   const patterns = derivePatternDistribution(recentPoints);
+  const aoiStats = deriveAoiStats(recentPoints);
 
   const returnVisitors = totalSessions > 1 ? toPct(((totalSessions - 1) / totalSessions) * 100) : 0;
   const attentionRetention = clamp(Math.round(100 - bounceRate), 0, 100);
@@ -377,7 +459,7 @@ function getLiveStats(_req, res) {
     variantB: calcVariant(variantB),
   };
 
-  return res.json({
+  const payload = {
     generatedAt: Date.now(),
     totals: {
       sessions: totalSessions,
@@ -405,6 +487,7 @@ function getLiveStats(_req, res) {
     patterns,
     alerts,
     recommendations,
+    aoiStats,
     ab,
     recentSessions,
     deviceStats: {
@@ -415,9 +498,37 @@ function getLiveStats(_req, res) {
       new: sessions.filter(s => s.userType === 'new').length,
       returning: sessions.filter(s => s.userType === 'returning').length,
     }
-  });
+  };
+
+  // Store in TTL cache
+  statsCache = payload;
+  statsCachedAt = Date.now();
+
+  return res.json(payload);
+}
+
+function logCalibrationEvent(req, res) {
+  const { sessionId, quality = 'good', pointsCompleted = 9 } = req.body || {};
+  logEvent('calibration', sessionId || null, { quality, pointsCompleted });
+  return res.json({ ok: true });
+}
+
+function logDwellEvent(req, res) {
+  const { sessionId, element, x, y } = req.body || {};
+  logEvent('dwell', sessionId || null, { element, x, y });
+  return res.json({ ok: true });
+}
+
+function logBlinkEvent(req, res) {
+  const { sessionId } = req.body || {};
+  logEvent('blink', sessionId || null, {});
+  return res.json({ ok: true });
 }
 
 module.exports = {
   getLiveStats,
+  logCalibrationEvent,
+  logDwellEvent,
+  logBlinkEvent,
 };
+

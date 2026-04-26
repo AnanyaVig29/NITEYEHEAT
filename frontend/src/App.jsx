@@ -11,7 +11,8 @@ import "./styles/reports.css";
 import "./styles/abtesting.css";
 import "./styles/EyeMovementPatterns.css";
 import "./styles/heatmaps.css";
-//import "./styles/Login.css";
+import "./styles/tracker.css";
+//import "././styles/Login.css";
 import "./styles/settings.css";
 
 // Import pages

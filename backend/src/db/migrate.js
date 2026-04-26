@@ -26,6 +26,20 @@ try {
     console.log('Added user_type to sessions');
   }
 
+  // Create event_log table if it doesn't exist
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS event_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id TEXT REFERENCES sessions(id) ON DELETE CASCADE,
+      type TEXT NOT NULL,
+      ts INTEGER NOT NULL,
+      metadata TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_event_session ON event_log(session_id);
+    CREATE INDEX IF NOT EXISTS idx_event_type ON event_log(type);
+  `);
+  console.log('Ensured event_log table exists');
+
   console.log('Migration completed successfully.');
 } catch (error) {
   console.error('Migration failed:', error);

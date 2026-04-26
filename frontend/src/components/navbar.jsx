@@ -12,7 +12,8 @@ import {
   Settings, 
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Map
 } from "lucide-react";
 
 function Navbar({ isOpen, toggleNav }) {
@@ -53,7 +54,7 @@ function Navbar({ isOpen, toggleNav }) {
                         <Flame size={20} /> <span>Heatmaps</span>
                     </NavLink>
                     <NavLink to="/sessions" onClick={collapseOnMobile} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-                        <Video size={20} /> <span>Recordings</span>
+                        <Map size={20} /> <span>User Journeys</span>
                     </NavLink>
                 </div>
 

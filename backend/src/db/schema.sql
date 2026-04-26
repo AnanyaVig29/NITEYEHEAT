@@ -19,3 +19,14 @@ CREATE TABLE IF NOT EXISTS gaze_points (
 
 CREATE INDEX IF NOT EXISTS idx_gaze_session ON gaze_points(session_id);
 CREATE INDEX IF NOT EXISTS idx_gaze_ts ON gaze_points(ts);
+
+CREATE TABLE IF NOT EXISTS event_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT REFERENCES sessions(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  ts INTEGER NOT NULL,
+  metadata TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_session ON event_log(session_id);
+CREATE INDEX IF NOT EXISTS idx_event_type ON event_log(type);

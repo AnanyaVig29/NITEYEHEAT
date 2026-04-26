@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db/database');
+const { logEvent } = require('../db/eventLog');
 
 function startSession(req, res) {
   const { pageUrl, device = 'desktop', userType = 'new' } = req.body || {};
@@ -82,6 +83,32 @@ function saveBatch(req, res) {
   db.prepare(
     'UPDATE sessions SET point_count = point_count + ? WHERE id = ?'
   ).run(points.length, sessionId);
+
+  // Detect fixation clusters and log them as events
+  try {
+    let clusterStart = 0;
+    let clusterLen = 1;
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const dist = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+      if (dist <= 20) {
+        clusterLen += 1;
+        if (clusterLen === 3) {
+          // Log a fixation event at the cluster centroid
+          const slice = points.slice(clusterStart, i + 1);
+          const cx = Math.round(slice.reduce((s, p) => s + p.x, 0) / slice.length);
+          const cy = Math.round(slice.reduce((s, p) => s + p.y, 0) / slice.length);
+          logEvent('fixation', sessionId, { x: cx, y: cy, length: clusterLen, ts: curr.ts });
+        }
+      } else {
+        clusterStart = i;
+        clusterLen = 1;
+      }
+    }
+  } catch (_err) {
+    // Non-blocking
+  }
 
   return res.json({ saved: points.length });
 }

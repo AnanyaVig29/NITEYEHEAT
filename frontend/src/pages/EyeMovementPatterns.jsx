@@ -9,6 +9,7 @@ import {
   MousePointer2,
   Info
 } from "lucide-react";
+import GazeTracker from "../components/GazeTracker";
 
 const PatternCard = ({ id, title, desc, usage, icon: Icon }) => (
     <div className="pattern-card">
@@ -61,6 +62,10 @@ export default function EyeTracking() {
                     <p>Behavioral archetypes based on fixation sequences.</p>
                 </div>
             </header>
+
+            <div className="tracker-dashboard">
+                <GazeTracker />
+            </div>
 
             <div className="patterns-grid">
                 {patternData.map((p) => (

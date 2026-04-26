@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import h337 from 'heatmap.js';
 
-export default function HeatmapCanvas({ getPoints, active }) {
+export default function HeatmapCanvas({ getPoints, active, scaleToViewport = false }) {
   const containerRef = useRef(null);
   const heatmapRef = useRef(null);
   const rafRef = useRef(null);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -35,27 +36,37 @@ export default function HeatmapCanvas({ getPoints, active }) {
       return;
     }
 
-    const draw = () => {
-      const points = getPoints().map((p) => ({
-        x: Math.round(p.x),
-        y: Math.round(p.y),
-        value: 1,
-      }));
+    const draw = () => setTick((value) => value + 1);
 
-      if (points.length > 0) {
-        heatmapRef.current.setData({
-          max: 6,
-          data: points,
-        });
-      }
-    };
-
-    rafRef.current = setInterval(draw, 500); // Draw every 500ms
+    const intervalMs = window.innerWidth <= 900 ? 700 : 450;
+    rafRef.current = setInterval(draw, intervalMs);
 
     return () => {
       clearInterval(rafRef.current);
     };
-  }, [active, getPoints]);
+  }, [active]);
+
+  const heatmapData = useMemo(() => {
+    const points = getPoints().map((p) => {
+      const x = scaleToViewport ? Math.min(Math.max(p.x, 0), window.innerWidth - 1) : p.x;
+      const y = scaleToViewport ? Math.min(Math.max(p.y, 0), window.innerHeight - 1) : p.y;
+      return {
+        x: Math.round(x),
+        y: Math.round(y),
+        value: 1,
+      };
+    });
+
+    return points;
+  }, [getPoints, scaleToViewport, tick]);
+
+  useEffect(() => {
+    if (!active || !heatmapRef.current || !heatmapData.length) return;
+    heatmapRef.current.setData({
+      max: 6,
+      data: heatmapData,
+    });
+  }, [active, heatmapData]);
 
   return <div ref={containerRef} className="heatmap-layer" />;
 }

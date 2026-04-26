@@ -135,6 +135,15 @@ export async function getSessions() {
   return res.json();
 }
 
+export async function downloadSessionJson(sessionId) {
+  const res = await apiFetch(`/sessions/${sessionId}/json`);
+  if (!res.ok) {
+    throw new Error('Failed to export session JSON');
+  }
+
+  return res.blob();
+}
+
 export async function getLiveStats() {
   const res = await apiFetch('/stats/live');
   if (!res.ok) {
@@ -157,4 +166,46 @@ export function startBatchInterval(sessionId, getPoints, clearBuffer, onSaved) {
       console.error('Failed to post gaze batch:', err);
     }
   }, 5000);
+}
+
+export async function getSessionSummary(sessionId) {
+  const res = await apiFetch(`/sessions/${sessionId}/summary`);
+  if (!res.ok) throw new Error('Failed to fetch session summary');
+  return res.json();
+}
+
+export async function logCalibrationQuality(sessionId, quality = 'good', pointsCompleted = 9) {
+  try {
+    await apiFetch('/stats/log/calibration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, quality, pointsCompleted }),
+    });
+  } catch (_err) {
+    // Non-blocking
+  }
+}
+
+export async function logDwellClick(sessionId, element, x, y) {
+  try {
+    await apiFetch('/stats/log/dwell', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, element, x, y }),
+    });
+  } catch (_err) {
+    // Non-blocking
+  }
+}
+
+export async function logBlinkEvent(sessionId) {
+  try {
+    await apiFetch('/stats/log/blink', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    });
+  } catch (_err) {
+    // Non-blocking
+  }
 }

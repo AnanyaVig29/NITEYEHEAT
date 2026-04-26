@@ -12,7 +12,7 @@ const POINTS = [
   { id: 8, x: '90%', y: '90%' },
 ];
 
-export default function CalibrationOverlay({ onComplete }) {
+export default function CalibrationOverlay({ onComplete, onQuickRecalibrate }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [clicksOnCurrent, setClicksOnCurrent] = useState(0);
   const REQUIRED_CLICKS = 5;
@@ -43,6 +43,14 @@ export default function CalibrationOverlay({ onComplete }) {
       }
       return next;
     });
+  };
+
+  const handleQuickDot = () => {
+    if (!window.webgazer?.recordScreenPosition) return;
+    const x = Math.round(window.innerWidth / 2);
+    const y = Math.round(window.innerHeight / 2);
+    window.webgazer.recordScreenPosition(x, y, 'click');
+    onQuickRecalibrate?.();
   };
 
   return (
@@ -79,6 +87,9 @@ export default function CalibrationOverlay({ onComplete }) {
       <div className="calibration-message">
         <p>Look at the orange dot and click it 5 times. Keep your head still.</p>
         <p>{currentIndex >= POINTS.length ? 'Calibration complete.' : `Calibrating point ${currentIndex + 1} of 9...`}</p>
+        <button type="button" onClick={handleQuickDot} style={{ marginTop: '12px' }}>
+          Quick recalibrate center
+        </button>
       </div>
     </div>
   );

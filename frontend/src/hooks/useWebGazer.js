@@ -6,7 +6,7 @@ const MAX_VELOCITY_PX_PER_SEC = 2800;
 const SMOOTHING_ALPHA = 0.38;
 const MIN_MOVEMENT_PX = 1.5;
 
-export function useWebGazer({ onGaze, enabled, onError }) {
+export function useWebGazer({ onGaze, enabled, onError, privacyMode = true }) {
   const listenerRef = useRef(onGaze);
   const startedRef = useRef(false);
   const smoothPointRef = useRef(null);
@@ -89,14 +89,14 @@ export function useWebGazer({ onGaze, enabled, onError }) {
         webgazer.applyKalmanFilter(true);
       }
       webgazer.showPredictionPoints(true);
-      webgazer.showVideoPreview(true);
+      webgazer.showVideoPreview(!privacyMode);
       webgazer.showFaceOverlay(false);
       startedRef.current = true;
     } catch (err) {
       onError?.(err);
       throw err;
     }
-  }, [onError]);
+  }, [onError, privacyMode]);
 
   const stopTracking = useCallback(() => {
     if (!webgazer) return;

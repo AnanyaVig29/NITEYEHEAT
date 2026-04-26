@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/sessions.css";
 import { useLiveAnalytics } from "../hooks/useLiveAnalytics";
 import { formatDuration, formatNumber } from "../utils/liveFormat";
+import { downloadSessionJson } from "../utils/gazeApi";
 import { 
   Play, 
   Pause, 
@@ -15,7 +16,8 @@ import {
   Calendar,
   Monitor,
   Smartphone,
-  Maximize2
+    Maximize2,
+    Download
 } from "lucide-react";
 
 const SessionPlayer = ({ session, onClose }) => {
@@ -134,6 +136,7 @@ export default function Sessions() {
     const [selectedSession, setSelectedSession] = useState(null);
     const [showFrustratedOnly, setShowFrustratedOnly] = useState(false);
     const [useLast24h, setUseLast24h] = useState(true);
+    const [exportingSessionId, setExportingSessionId] = useState('');
     const recentSessions = data?.recentSessions || [];
     const now = Date.now();
     const filteredSessions = recentSessions.filter((s) => {
@@ -142,13 +145,30 @@ export default function Sessions() {
         return inWindow && frustrated;
     });
 
+    const handleExportJson = async (session) => {
+        try {
+            setExportingSessionId(session.id);
+            const blob = await downloadSessionJson(session.id);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `session-${session.id}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setExportingSessionId('');
+        }
+    };
+
     if (loading) return <div className="loading-state">Loading recordings...</div>;
 
     return (
         <div className="sessions-page">
             <header className="page-header">
                 <div className="title-group">
-                    <h1>Session Recordings</h1>
+                    <h1>User Journeys</h1>
                     <p>Replay user journeys and identify friction points.</p>
                 </div>
                 <div className="header-filters">
@@ -188,9 +208,14 @@ export default function Sessions() {
                             </div>
                             <div className="engagement-cell">
                                 <div className="engagement-bar">
-                                    <div className="bar-fill" style={{ width: '75%' }}></div>
+                                    <div className="bar-fill" style={{ width: `${s.engagementScore ?? 50}%` }}></div>
                                 </div>
                                 <span className="dur">{formatDuration(s.durationMs)}</span>
+                                {s.fixationCount > 0 && (
+                                  <span title="Fixations" style={{ fontSize: '11px', color: 'var(--chart-teal)', marginTop: 2 }}>
+                                    {s.fixationCount} fixations
+                                  </span>
+                                )}
                             </div>
                             <div className="device-cell">
                                 {s.device === 'mobile' ? <Smartphone size={18} /> : <Monitor size={18} />}
@@ -207,6 +232,17 @@ export default function Sessions() {
                                     }}
                                 >
                                     <Play size={16} fill="currentColor" />
+                                </button>
+                                <button
+                                    className="play-btn"
+                                    title="Export JSON"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleExportJson(s);
+                                    }}
+                                    disabled={exportingSessionId === s.id}
+                                >
+                                    <Download size={16} />
                                 </button>
                             </div>
                         </div>
